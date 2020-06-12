@@ -54,9 +54,15 @@ Go to the EC2 dashboard and create a new Key Pair.
 Download as a .pem file and secure that file. Do not delete.
 To [SSH into EC2 instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html), go to file in command line and run:
 
+`my-instance-user-name` differ depending on the instance OS:
+
+Amazon Linux: ec2-user
+
+Ubuntu: ubuntu
+
 ``` bash
 chmod 400 /path/my-key-pair.pem
-ssh -i /path/my-key-pair.pem my-instance-user-name@my-instance-public-dns-name
+sudo ssh -i /path/my-key-pair.pem my-instance-user-name@my-instance-public-dns-name
 ```
 
 - EC2 Security Groups
