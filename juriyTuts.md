@@ -1,14 +1,28 @@
 - Create an EC2 instance and download the key pair to ssh into it.
 - Associate an Elastic IP to the instance
-- Open port 3000
+- Open port **3000** to test server 
 
 ```
 Right click on instance > Networking > Change security groups > [Simply note the instance's security group]
 EC2 Dashboard > Network and Security > Security Groups > [Select the instance's security group] > 
-Inbound rules > Edit inbound rules > Add Rule > Type: Custom TCP > Port Range: 3000 or pick another > Source: Anywhere 
+Inbound rules > Edit inbound rules > Add Rule > Type: Custom TCP > Port Range: 3000 or pick another > Source: your home CIDR block 
 ```
 
-- Become root
+EC2 > Security Groups 
+| Type       | Protocol | Port range | Source (Use your home CIDR block) | Description - optional |
+|------------|----------|------------|-----------------------------------|------------------------|
+| SSH        | TCP      | 22         | X.X.X.X/24                        | Home                   |
+| Custom TCP | TCP      | 3000       | X.X.X.X/24                        | nginx tests            |
+
+- If working on Windows
+
+Move the .pem file you got from the AWS EC2 instance somewhere in the [C: drive](https://stackoverflow.com/questions/39404087/pem-file-permissions-on-bash-on-ubuntu-on-windows).
+
+```sh
+chmod 400 /path/to/key.pem
+```
+
+- Become root to setup server faster without sudo
 ```sh
 sudo su
 ```
@@ -17,11 +31,30 @@ sudo su
 exit
 ```
 
+If you're not root you will need to preceed the commands with `sudo`
+
 - Update and upgrade Ubuntu (or whatever your OS is)
 
 ```sh
+# Amazon Linux
+yum -y update
+# -y : Don't ask for confirmation
+
+# Ubuntu
 sudo apt-get update && sudo apt-get upgrade -y
 ```
+
+- Install yum Development Tools
+```sh
+# Amazon Linux
+yum -y groupinstall "Development Tools"
+```
+
+- Verify that you have Vim and net-tools installed
+```sh
+yum list installed | egrep 'vim|net-tools'
+```
+
 - Download the necessary [packages](https://packages.ubuntu.com/) to install Node.js
 ```sh
 sudo apt-get install build-essential
@@ -34,6 +67,9 @@ sudo apt-get install net-tools
 **Node.js v14.x**:
 
 ```sh
+# As root Amazon Linux
+curl -sL https://rpm.nodesource.com/setup_14.x | bash -
+
 # Using Ubuntu
 curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 sudo apt-get install -y nodejs
@@ -52,9 +88,15 @@ sudo npm install -g pm2 http-server
 echo "Hello World" > index.html
 http-server
 ```
-- Install [yarn](https://classic.yarnpkg.com/en/docs/install/#debian-stable)
+- Install [yarn](https://classic.yarnpkg.com/en/docs/install/#centos-stable)
 
 ```sh
+# Amazon Linux
+curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+
+yum install yarn
+
+# Ubuntu
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
@@ -62,14 +104,54 @@ echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/source
 sudo apt update && sudo apt install yarn
 ```
 - Configure non-root user?
+```sh
+# Add a user
+adduser someUser
+
+# Make user an admin by adding to 'wheel' group (Optional)
+usermod -aG wheel someUser
+
+# See what groups the user is added to
+groups
+
+# Switch to someUser
+sudo su - someUser
+
+# See what user you're using
+whoami
+
+# Set up keys to connect without password
+mkdir ~/.ssh
+
+# Change folder permissions
+# 700: only give access to current user
+chmod 700 ~/.ssh
+
+# create new keys file
+touch ~/.ssh/authorized_keys
+
+# Change keys permissions
+chmod 600 ~/.ssh/authorized_keys
+
+# Verify permissions
+ls -lRa ~/. | egrep '.ssh|authorized_keys'
+# -l : verbose output
+# -R : Recursive mode
+# -a : all files 
+```
+
+- Compress project files
+```sh
+tar czf <FILENAME>.tar.gz file1 file2 file3
+```
 
 - Tranfer files between local machine and EC2 instance
 ```sh
-sudo scp -i keys.pem <ANYFILE>.tar.gz ubuntu@<EC2 PUBLIC IP>:~
+sudo scp -i keys.pem <FILENAME>.tar.gz <USER>@<EC2 PUBLIC IP>:~
 ```
 - Extract tar file
 ```sh
-tar xf <ANYFILE>.tar.gz
+tar xf <FILENAME>.tar.gz
 ```
 - Run app with PM2
 
@@ -86,5 +168,182 @@ pm2 startup
 
 - Restart EC2 instance (DANGER)
 ```sh
-sudo shutdown -r now
+shutdown -r now
+# or
+reboot
 ```
+
+- Create a deploy script
+
+```sh
+touch deploy.sh
+
+#!/bin/bash
+
+# Compress all the necessary files
+tar czf <ANYFILE>.tar.gz serve.js  package.json public README.md
+# c : compress
+# z : zip
+# f : file
+
+# Transfer files to EC2 instance
+sudo scp -i keys.pem <ANYFILE>.tar.gz ubuntu@<EC2 PUBLIC IP>:~
+# -i : Insert private key file
+
+# Remove the .tar.gz file from local PC
+rm <ANYFILE>.tar.gz
+
+# Run commands remotely
+ssh ubuntu@<EC2 PUBLIC IP> << 'ENDSSH'
+# Stop PM2 app
+pm2 stop <app name>
+
+# Delete current version of the app
+rm -rf <app directory>
+
+# Create new app directory
+mkdir <new app directory>
+
+# Unzip .tar.gz file
+tar xf <ANYFILE>.tar.gz -C <new app directory>
+# x : extract
+# f : file
+
+# Install dependencies
+cd <new app directory>
+npm install
+
+# restart app
+pm2 start <new app name>
+ENDSSH
+```
+
+- SELinux configuration [article](https://www.digitalocean.com/community/tutorials/an-introduction-to-selinux-on-centos-7-part-1-basic-concepts), [video](https://www.youtube.com/watch?v=HhydNtaLEK0&list=PLQlWzK5tU-gDyxC1JTpyC2avvJlt3hrIh&index=9)
+
+```sh
+# Allow HTTP servers to connect to other backends
+setsebool -P httpd_can_network_connect on
+# -P : persist change
+
+# Allow HTTP servers to read files from user home directory
+setsebool -P httpd_enable_homedirs on
+
+# Change the context of the static folder and its files to be accessible
+chcon -Rt httpd_sys_content_t /path/to/static_folder
+# -R : Recursive change
+# -t : Change directory/file TYPE
+
+# Check SELinux mode
+getenforce
+
+# SELinux debugging
+# Set SELinux to enforce mode
+setenforce 1
+
+# Set SELinux to permissive mode
+setenforce 0
+
+# Check the context details for files and directories
+ls -lZ
+# Check context of current processes
+ps auxZ
+```
+
+- Network intefaces
+
+```sh
+# interface configuration
+ifconfig 
+
+# Network statistics
+netstat
+
+# view open ports using netstat
+netstat -tln 
+# -t: Only TCP
+# -l: Ports that are listening
+# -n: IPs as numbers, not hostnames
+```
+
+- SELinux
+
+- Install Nginx
+
+```sh
+# Extra Packages for Enterprise Linux
+yum install -y epel-release 
+
+# epel-release is available in Amazon Linux Extra topic "epel"   
+amazon-linux-extras install epel
+
+# Install Nginx
+yum install -y nginx 
+```
+
+- Start Nginx
+
+```sh
+# Startup and system management for Amazon Linux
+systemctl start nginx
+
+# Check status
+systemctl status nginx
+
+# Make Nginx persistant on restart
+systemctl enable nginx
+
+# Edit Nginx config file
+vim /etc/nginx/nginx.conf
+
+# Create separate configuration file
+touch /etc/nginx/conf.d/myConf.conf
+```
+- Nginx .conf file
+```
+server {
+  # default_server already in original .conf
+  # nginx listens on port 80 and redirects to a port I want
+  # So there's no need to add port in the address bar.
+  listen       80;
+  listen       [::]:80;
+  # what the user type in the address bar
+  server_name  18.223.129.102;
+  # root       /usr/share/nginx/html;
+
+  # OPTIONAL to enable web sockets (socket.io)
+  location /socket.io/ {
+    proxy_http_version 1.1;
+
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+
+    proxy_pass "https://localhost:3000/socket.io/";
+  }
+
+  # Redirect ALL trafic to Node.js app
+  location / {
+    proxy_pass "http://localhost:3000/";
+  }
+
+  error_page 404 /404.html;
+      location = /40x.html {
+  }
+
+  # In case of a catastrophic failure,
+  # nginx will handle the request
+  error_page 500 502 503 504 /50x.html;
+      location = /50x.html {
+  }
+}
+
+```
+
+- Test nginx after every modification to .conf files
+
+```sh
+nginx -t
+
+# If successful, restart
+systemctl restart nginx
+```
+
