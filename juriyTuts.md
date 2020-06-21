@@ -407,3 +407,19 @@ drwx--x--- mike nginx mike
 
 
 ```
+
+CERTBOT
+
+```sh
+certbot certonly --webroot -d <insert-domain.com> -w /path/to/public/directory
+```
+
+
+- crontab
+
+```sh
+crontab -e
+
+# Check crontab log file
+tail /var/log/cron
+```
