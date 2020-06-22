@@ -1,2 +1,2 @@
 # Check if SSL certificate needs to be renewed everyday at 3AM
-0 3 * * * certbot renew --post-hook "systemctl restart nginx && /root/SSH_BACKUP.sh"
+0 3 * * * certbot renew --post-hook "systemctl reload nginx && /root/SSH_BACKUP.sh"

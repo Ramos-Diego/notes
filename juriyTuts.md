@@ -1,18 +1,19 @@
 - Create an EC2 instance and download the key pair to ssh into it.
 - Associate an Elastic IP to the instance
-- Open port **3000** to test server 
 
 ```
 Right click on instance > Networking > Change security groups > [Simply note the instance's security group]
 EC2 Dashboard > Network and Security > Security Groups > [Select the instance's security group] > 
-Inbound rules > Edit inbound rules > Add Rule > Type: Custom TCP > Port Range: 3000 or pick another > Source: your home CIDR block 
+Inbound rules > Edit inbound rules > Add Rule > Fill the fields according to this table
 ```
 
 EC2 > Security Groups 
-| Type       | Protocol | Port range | Source (Use your home CIDR block) | Description - optional |
-|------------|----------|------------|-----------------------------------|------------------------|
-| SSH        | TCP      | 22         | X.X.X.X/24                        | Home                   |
-| Custom TCP | TCP      | 3000       | X.X.X.X/24                        | nginx tests            |
+
+| Type  | Protocol | Port range | Source (CIDR blocks) | Description   |
+|-------|----------|------------|----------------------|---------------|
+| HTTP  | TCP      | 80         | 0.0.0.0/0            | HTTP          |
+| SSH   | TCP      | 22         | 1.2.3.4/24           | ADMIN IP ONLY |
+| HTTPS | TCP      | 443        | 0.0.0.0/0            | HTTPS         |
 
 - If working on Windows
 
@@ -33,7 +34,7 @@ exit
 
 If you're not root you will need to preceed the commands with `sudo`
 
-- Update and upgrade Ubuntu (or whatever your OS is)
+- Update and upgrade your linux OS
 
 ```sh
 # Amazon Linux
@@ -42,6 +43,7 @@ yum -y update
 
 # Ubuntu
 sudo apt-get update && sudo apt-get upgrade -y
+# -y : Don't ask for confirmation
 ```
 
 - Install yum Development Tools
@@ -81,13 +83,9 @@ apt-get install -y nodejs
 - Install global tools
 
 ```sh
-sudo npm install -g pm2 http-server
+npm install -g pm2
 ```
-- Test sample page
-```sh
-echo "Hello World" > index.html
-http-server
-```
+
 - Install [yarn](https://classic.yarnpkg.com/en/docs/install/#centos-stable)
 
 ```sh
@@ -182,19 +180,17 @@ touch deploy.sh
 
 # Compress all the necessary files
 tar czf <ANYFILE>.tar.gz serve.js  package.json public README.md
-# c : compress
-# z : zip
-# f : file
+# c : compress, z : zip, f : file
 
 # Transfer files to EC2 instance
-sudo scp -i keys.pem <ANYFILE>.tar.gz ubuntu@<EC2 PUBLIC IP>:~
+sudo scp -i keys.pem <ANYFILE>.tar.gz ec2-user@<EC2 PUBLIC IP>:~
 # -i : Insert private key file
 
 # Remove the .tar.gz file from local PC
 rm <ANYFILE>.tar.gz
 
 # Run commands remotely
-ssh ubuntu@<EC2 PUBLIC IP> << 'ENDSSH'
+ssh ec2-user@<EC2 PUBLIC IP> << 'ENDSSH'
 # Stop PM2 app
 pm2 stop <app name>
 
@@ -206,12 +202,11 @@ mkdir <new app directory>
 
 # Unzip .tar.gz file
 tar xf <ANYFILE>.tar.gz -C <new app directory>
-# x : extract
-# f : file
+# x : extract, f : file
 
 # Install dependencies
 cd <new app directory>
-npm install
+yarn install
 
 # restart app
 pm2 start <new app name>
@@ -265,8 +260,6 @@ netstat -tln
 # -n: IPs as numbers, not hostnames
 ```
 
-- SELinux
-
 - Install Nginx
 
 ```sh
@@ -298,45 +291,6 @@ vim /etc/nginx/nginx.conf
 
 # Create separate configuration file
 touch /etc/nginx/conf.d/myConf.conf
-```
-- Nginx .conf file
-```
-server {
-  # default_server already in original .conf
-  # nginx listens on port 80 and redirects to a port I want
-  # So there's no need to add port in the address bar.
-  listen       80;
-  listen       [::]:80;
-  # what the user type in the address bar
-  server_name  18.223.129.102;
-  # root       /usr/share/nginx/html;
-
-  # OPTIONAL to enable web sockets (socket.io)
-  location /socket.io/ {
-    proxy_http_version 1.1;
-
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
-
-    proxy_pass "https://localhost:3000/socket.io/";
-  }
-
-  # Redirect ALL trafic to Node.js app
-  location / {
-    proxy_pass "http://localhost:3000/";
-  }
-
-  error_page 404 /404.html;
-      location = /40x.html {
-  }
-
-  # In case of a catastrophic failure,
-  # nginx will handle the request
-  error_page 500 502 503 504 /50x.html;
-      location = /50x.html {
-  }
-}
-
 ```
 
 - Test nginx after every modification to .conf files
@@ -399,13 +353,6 @@ f: /home/mike/myNginx/public/
 drwx------ mike nginx mike
 # to 
 drwx--x--- mike nginx mike
-```
-
-- Make Nginix HTTPS
-
-```sh
-
-
 ```
 
 CERTBOT
