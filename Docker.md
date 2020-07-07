@@ -57,7 +57,7 @@ In this case we also add the mantainer of the Dockerfile: mantainer/buildName:ta
 
 The `.` refers to the current directory. Which means that I am running this command in the same directory where the Dockerfile is stored.
 
-## Interact with image using the CLI
+## Interact with image using the [CLI](https://stackoverflow.com/questions/30172605/how-do-i-get-into-a-docker-containers-shell)
 
 ```sh
 docker exec -it <containerName> bash

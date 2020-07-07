@@ -1,3 +1,9 @@
+Check the operating system you're working with:
+
+```sh
+lsb_release -a
+```
+
 - Create an EC2 instance and download the key pair to ssh into it.
 - Associate an Elastic IP to the instance
 
