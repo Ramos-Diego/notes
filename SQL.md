@@ -95,3 +95,10 @@ CREATE DATABASE test;
 
 GRANT ALL ON test.* TO jeff@<YOUR-OWN-IP> IDENTIFIED BY "<INSERT_PASSWORD>"
 ```
+
+## NOTES
+
+https://www.youtube.com/watch?v=HXV3zeQKqGY
+
+### Table relationships
+Composite key: A key that depends on two columns.
