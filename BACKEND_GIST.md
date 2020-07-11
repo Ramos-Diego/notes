@@ -18,7 +18,7 @@ Remember that you can only run one EC2 instance at a time to stay within AWS' fr
 
 Once our app is ready for deployment follow these steps:
 
-- Create an EC2 instance and download the key pair to ssh into it.
+- Create an EC2 instance and download the key pair to SSH into it.
 - Associate an Elastic IP to the instance
 
 Open PORT 22 and add your IP to be able to SSH into the EC2 instance.
@@ -43,17 +43,21 @@ Learn about [CIDR blocks](https://www.youtube.com/watch?v=z07HTSzzp3o).
 
 ---
 
+### Setup your local computer to connect through SSH
+
+Note: If you're using Windows 10 you will need WSL to run some command locally.
+
+[Install WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
+
 Save the `.pem` file that you downloaded when creating the EC2 instance in a safe location in your local machine. 
 
-### Change the SSH key's permissions
+Change the SSH key's permissions
 
 ```sh
 chmod 400 /path/to/key.pem
 ```
 
-### Setup your local computer to connect through SSH
-
-I recommend you setup an alias in your local machine to remote into your server. Note that the default ssh usernames for EC2 instances changes depending on the distro.
+I recommend you setup an alias in your local machine to remote into your server. Note that the default SSH usernames for EC2 instances changes depending on the distro.
 
 Amazon Linux
 ```sh
@@ -88,14 +92,12 @@ FILE TYPE --> - rwx r-x -wx    -:DENIED
                 +++ +++ +++    EXAMPLES:
                 421 421 421             drw-rwxrwx
                  v   v   v              -r--r--r--
-    CHMOD 753 =  7   5   3              lrwx---rwx
+    chmod 753 =  7   5   3              lrwx---rwx
 ```
 
 ### Note
 
 I will provide examples in Amazon Linux 2 and Ubuntu because these derive from Debian and REHL, which are the type of Linux distributions you're most likely to use on your server.
-
-Although this tutorial is done with AWS EC2 running Amazon Linux 2 (AL2), you can follow along the general setup in any linux distro. 
 
 If your server is runnin Ubuntu, you will use `apt-get` instead of `yum` as a package manager and `AppArmor` instead of `SELinux` to secure the server.
 
@@ -103,12 +105,11 @@ Use this command to know what kind of Linux distro you're using:
 
 ```sh
 cat /etc/*release | grep 'ID_LIKE'
-# OUPUT for Amazon Linux 2
+# OUTPUT for Amazon Linux 2
 # ID_LIKE="centos rhel fedora"
 ```
 
-### Become `root` to setup the server
-
+Become `root` to setup the server
 ```sh
 sudo su
 ```
@@ -117,66 +118,56 @@ If you're not `root` you will need to preceed all commands with `sudo`.
 
 ---
 
-### Update and upgrade your linux OS
+**Update and upgrade your linux OS**
 
-Amazon Linux
+*Amazon Linux*
 ```sh
 yum -y update
 ```
 - `-y`: Don't ask for confirmation
 
-Ubuntu
+*Ubuntu*
 ```sh
 sudo apt-get update && sudo apt-get upgrade -y
 ```
 
 TODO: What does the dev tools contian?
 
-### Install Development Tools
+**Install Development Tools**
 
-Amazon Linux
+*Amazon Linux*
 ```sh
 yum -y groupinstall "Development Tools"
 ```
 
-Ubuntu
-
+*Ubuntu*
 ```sh
-sudo apt-get install net-tools
-```
-```sh
-sudo apt-get install build-essential
+sudo apt-get install net-tools build-essential
 ```
 
-Verify that you have Vim and net-tools installed
-
+**Verify that you have Vim and net-tools installed**
 ```sh
 yum list installed | egrep 'vim|net-tools'
 ```
 
-### Install Node.js in Amazon Linux 2
+### Install Node.js
 
-Download the necessary [packages](https://packages.ubuntu.com/) to install Node.js
-
-Install Node.js:
-
-Amazon Linux
+[*Amazon Linux*](https://github.com/nodesource/distributions/blob/master/README.md#installation-instructions-1)
 ```sh
 curl -sL https://rpm.nodesource.com/setup_14.x | bash -
 ```
 
-Ubuntu
+[*Ubuntu*](https://github.com/nodesource/distributions/blob/master/README.md#installation-instructions)
 ```sh
 curl -sL https://deb.nodesource.com/setup_14.x | bash -
 apt-get install -y nodejs
 ```
 
+### Install yarn
 
 Yarn is a faster and improved alternative to NPM.
 
-- Install [yarn](https://classic.yarnpkg.com/en/docs/install/#centos-stable)
-
-Amazon Linux
+[*Amazon Linux*](https://classic.yarnpkg.com/en/docs/install/#centos-stable)
 ```sh
 curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
 ```
@@ -184,26 +175,24 @@ curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yu
 yum install yarn
 ```
 
-Ubuntu
+[*Ubuntu*](https://classic.yarnpkg.com/en/docs/install/#debian-stable)
 ```sh
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-```
-```sh
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 ```
 ```sh
-sudo apt update && sudo apt install yarn
+sudo apt update && sudo apt install -y yarn
 ```
 
-### Install PM2
+### Install [PM2](https://pm2.keymetrics.io/docs/usage/pm2-doc-single-page/#installation)
 
-yarn
-```
-yarn add -g pm2
-```
-NPM
+*yarn*
 ```sh
-npm install -g pm2
+yarn global add pm2
+```
+*npm*
+```sh
+npm install pm2@latest -g
 ```
 
 Once the server has been setup, we need to create a non-root user. You should not run any app that can access the internet as root.
@@ -213,36 +202,33 @@ Once the server has been setup, we need to create a non-root user. You should no
 ### Configure non-root user
 
 Add an user
-
 ```sh
 adduser <insert-username>
 ```
 
-Make user an admin by adding to 'wheel' group (Optional)
+Make the user an admin by adding to [**wheel**](https://www.wikiwand.com/en/Wheel_(computing)) group (Optional)
 ```sh
 usermod -aG wheel <insert-username>
 ```
+- `-G, --groups GROUPS`: new list of supplementary GROUPS
+- `-a, --append`: append the user to the supplemental GROUPS mentioned by the -G option without removing the user from other groups
 
 See what groups the user is added to
-
 ```sh
 groups
 ```
 
 Switch to someUser
-
 ```sh
-sudo su - someUser
+sudo su - <insert-username>
 ```
 
-Verify your user
-
+Verify you're using the right user
 ```sh
 whoami
 ```
 
-Set up keys to connect without password
-
+### Set up keys to connect without password
 ```sh
 mkdir ~/.ssh
 ```
@@ -252,13 +238,11 @@ Change folder permissions
 700: gives **r**ead, **w**rite and e**x**excute permission to the owner
 
 `700 = - rwx --- ---`
-
 ```sh
 chmod 700 ~/.ssh
 ```
 
 Create new keys file
-
 ```sh
 touch ~/.ssh/authorized_keys
 ```
@@ -273,7 +257,6 @@ chmod 600 ~/.ssh/authorized_keys
 ```
 
 Verify permissions
-
 ```sh
 ls -lRa ~/. | egrep '.ssh|authorized_keys'
 ```
@@ -282,8 +265,7 @@ ls -lRa ~/. | egrep '.ssh|authorized_keys'
 - `-R`: Recursive mode
 - `-a`: All files 
 
-### All in one command
-
+**All in one command**
 ```sh
 adduser <insert-username> && \
 mkdir ~/.ssh && \
@@ -298,19 +280,34 @@ ls -lRa ~/. | egrep '.ssh|authorized_keys'
 For the sake of this tutorial we will zip our app and send it to the server using SSH. In a more advance setup this could be automated such that upon a commit to github the app gets updated in the server. Learn more about CI/CD.  
 
 ### Compress your app
-# TODO: see if you can exclude files instead of adding all
 ```sh
-tar czf <FILENAME>.tar.gz file1 file2 file3
+tar czf <FILENAME>.tar.gz -X .gitignore .
+```
+- `c`: create a new archive
+- `z`: filter the archive through **gzip**
+- `f`: use archive file or device ARCHIVE
+- `-X`: exclude patterns listed in FILE
+
+**WARNING:** Trailing slashes at the end of excluded folders will cause tar to NOT exclude those folders at all. This is specially important because you want to ignore the `/node_modules` directory.
+
+`.gitignore` example:
+
+```sh
+# Dependency directories
+node_modules
+
+# dotenv environment variables file
+.env
 ```
 
-Tranfer files from the local machine to the server
 
+Tranfer files from the local machine to the server
 ```sh
 sudo scp -i keys.pem <FILENAME>.tar.gz <USER>@<EC2 PUBLIC IP>:~
 ```
+Remember that `~` refers to the home directory
 
-Connect to your server and extract your app
-
+SSH into your server and extract your app
 ```sh
 tar xf <FILENAME>.tar.gz
 ```
@@ -324,15 +321,13 @@ pm2 start --name <insert-process-name> app.js
 ```
 
 Persist app upon reboot with PM2
-
 ```sh
 pm2 startup
 ```
 
-**FOLLOW THE INSTRUCTIONS PROVIDED BY PM2**
+**FOLLOW THE INSTRUCTIONS PROVIDED BY PM2** 
 
-Restart EC2 instance (DANGER)
-
+To make sure your app will persist upon reboot, restart EC2 instance (DANGER)
 ```sh
 reboot
 ```
@@ -343,18 +338,17 @@ or
 shutdown -r now
 ```
 
-Create a deploy script
+We can automate the process of zipping and transferring the file to our server by creating a **deploy script**:
 
 ```sh
-touch deploy.sh
+vim deploy.sh
 ```
 
 ```sh
 #!/bin/bash
 
 # Compress all the necessary files
-tar czf <filename>.tar.gz serve.js  package.json public README.md
-# c : compress, z : zip, f : file
+tar czf <FILENAME>.tar.gz -X .gitignore .
 
 # Transfer files to EC2 instance
 sudo scp -i <key-name>.pem <filename>.tar.gz ec2-user@<EC2-public-ip>:~
@@ -363,49 +357,61 @@ sudo scp -i <key-name>.pem <filename>.tar.gz ec2-user@<EC2-public-ip>:~
 # Remove the .tar.gz file from local PC
 rm <filename>.tar.gz
 
+# ---------------------------------------
+
 # Run commands remotely
 ssh ec2-user@<EC2-public-ip> << 'ENDSSH'
 # Stop PM2 app
-pm2 stop <app name>
+pm2 stop <app-name>
 
 # Delete current version of the app
-rm -rf <app directory>
+rm -rf <app-directory>
 
 # Create new app directory
-mkdir <new app directory>
+mkdir <new-app-directory>
 
 # Unzip .tar.gz file
-tar xf <ANYFILE>.tar.gz -C <new app directory>
-# x : extract, f : file
+tar xf <ANYFILE>.tar.gz -C <new-app-directory>
 
 # Install dependencies
-cd <new app directory>
+cd <new-app-directory>
 yarn install
 
 # restart app
-pm2 start <new app name>
+pm2 start <new-app-name>
 ENDSSH
 ```
 
-- SELinux configuration [article](https://www.digitalocean.com/community/tutorials/an-introduction-to-selinux-on-centos-7-part-1-basic-concepts), [video](https://www.youtube.com/watch?v=HhydNtaLEK0&list=PLQlWzK5tU-gDyxC1JTpyC2avvJlt3hrIh&index=9)
-
 ---
+
 ## SELinux
 
-Allow HTTP servers to connect to other backends
+SELinux is a Linux kernel security module that provides a mechanism for supporting access control security policies. It is known to be complicated, but you don't need to know all the details to use it.
 
+Amazon Linux 2 does not enfore SELinux by default.
+
+SELinux configuration [article](https://www.digitalocean.com/community/tutorials/an-introduction-to-selinux-on-centos-7-part-1-basic-concepts), [video](https://www.youtube.com/watch?v=HhydNtaLEK0&list=PLQlWzK5tU-gDyxC1JTpyC2avvJlt3hrIh&index=9)
+
+Check if SELinux is installed and enforced
+```sh
+getenforce
+# Expected output:
+# enforcing OR permissive OR disabled
+```
+
+
+Allow HTTP servers to connect to other backends
 ```sh
 setsebool -P httpd_can_network_connect on
 ```
 - `-P`: persist change
 
 Allow HTTP servers to read files from user home directory
-
 ```sh
 setsebool -P httpd_enable_homedirs on
 ```
 
-Change the context of the static folder and its files to be accessible
+Change the context of the static folder and its files to be accessible. In other words, enable your static files to be served by **Nginx**.
 
 ```sh
 chcon -Rt httpd_sys_content_t /path/to/static_folder
@@ -413,21 +419,14 @@ chcon -Rt httpd_sys_content_t /path/to/static_folder
 - `-R`: Recursive change
 - `-t`: Change directory/file TYPE
 
-Check SELinux mode
+**SELinux debugging**
 
-```sh
-getenforce
-```
-SELinux debugging
-
-Set SELinux to enforce mode
-
+Set SELinux to `enforce` mode
 ```sh
 setenforce 1
 ```
 
-Set SELinux to permissive mode
-
+Set SELinux to `permissive` mode. This mode only logs the output from SELinux, thus it can be used to debug your setup. If you make SELinux `permissive` and your app works as it should you need to check your policies.
 ```sh
 setenforce 0
 ```
@@ -439,65 +438,27 @@ ls -lZ
 
 Check context of current processes
 ```sh
-ps auxZ
+ps auxZ | grep nginx
 ```
 
----
-### Network intefaces
+AppArmor is the Ubuntu equivalent to SELinux.
 
-
-Interface configuration
-```sh
-ifconfig 
-```
-
-Network statistics
-```sh
-netstat
-```
-
-View open ports using netstat
-
-```sh
-netstat -tln 
-```
-
-- `-t`: Only TCP
-- `-l`: Ports that are listening
-- `-n`: IPs as numbers, not hostnames
-
-Expected output:
-
-```
-Active Internet connections (only servers)
-Proto Recv-Q Send-Q Local Address           Foreign Address         State
-tcp        0      0 127.0.0.1:8080          0.0.0.0:*               LISTEN
-tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN
-tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN
-tcp        0      0 0.0.0.0:443             0.0.0.0:*               LISTEN
-tcp6       0      0 :::80                   :::*                    LISTEN
-tcp6       0      0 :::22                   :::*                    LISTEN
-tcp6       0      0 :::443                  :::*                    LISTEN
-```
 
 ---
 
 ## Nginx
 
 Extra Packages for Enterprise Linux
-
 ```sh
 yum install -y epel-release 
 ```
 
 epel-release is available in Amazon Linux Extra topic "epel"   
-
 ```sh
 amazon-linux-extras install epel
 ```
 
 Install Nginx
-
 ```sh
 yum install -y nginx 
 ```
@@ -559,7 +520,7 @@ upstream nodejs {
 
 # --------- MOZILLA'S SUGGESTED SETUP ----------
 
-# Listen to any HTTP (:80) request and redirect to HTTPS (:443). 
+# Listen to any HTTP (:80) request and redirect to HTTPS (:443)
 server {
   listen 80; # IPv4
   listen [::]:80; # IPv6
@@ -575,42 +536,75 @@ server {
   # -------- GET SSL CERTIFICATES (RUN AS ROOT) ----------
 
   # Generate SSL certificates using certbot
+
+  # --------------------------------------------
   # $ certbot certonly --webroot -d <insert-domain.com> -w /path/to/static-files/directory
+  # --------------------------------------------
+
   # This will generate the ssl_certificate and ssl_certificate_key
   # without making any changes to our .conf file
 
   # Fill in the <insert-domain.com> as seen below
+  
+  # --------------------------------------------
   # $ vim /etc/nginx/conf.d/yourNginx.conf
+  # --------------------------------------------
 
   ssl_certificate /etc/letsencrypt/live/<insert-domain.com>/fullchain.pem;
   ssl_certificate_key /etc/letsencrypt/live/<insert-domain.com>/privkey.pem;
 
   # After saving the changes, MAKE SURE YOU MADE NO MISTAKES
+
+  # --------------------------------------------
   # $ nginx -t
+  # --------------------------------------------
+
+  # --------------------------------------------
   # CORRECT OUTPUT:
   # nginx: the configuration file /etc/nginx/nginx.conf syntax is ok  
   # nginx: configuration file /etc/nginx/nginx.conf test is successful
+  # --------------------------------------------
 
   # If and only if everything is okay, restart nginx
+
+  # --------------------------------------------
   # $ systemctl restart nginx
+  # --------------------------------------------
 
   # Optional: Check the nginx status after restart.
+  
+  # --------------------------------------------
   # $ systemctl status nginx
+  # --------------------------------------------
+  
+  # --------------------------------------------
   # You should see "Active: active (running)"
+  # --------------------------------------------
 
   # Create a backup SSL certificates script at /root/SSL_BACKUP.sh (SAFETY FIRST)
 
+  # ____________________________________________
   # #!/bin/bash
   # Compress and zip /letsencrypt directory and move it to a safe location
-  # $ cd /etc/ && tar czf SSL_BACKUP.tar.gz letsencrypt/ && mv SSL_BACKUP.tar.gz /home/user && rm -f SSL_BACKUP.tar.gz
+  
 
+  # --------------------------------------------
+  # $ cd /etc/ && tar czf SSL_BACKUP.tar.gz letsencrypt/ && mv SSL_BACKUP.tar.gz /home/user && rm -f SSL_BACKUP.tar.gz
+  # --------------------------------------------
+
+  # ____________________________________________
+  
   # Run this script once to save current files then set up a cron job
   # to automatically check and renew certificates
   
+  # --------------------------------------------
   # $ crontab -e
+  # --------------------------------------------
 
+  # --------------------------------------------
   # # Check if SSL certificate needs to be renewed everyday at 3AM
   # 0 3 * * * certbot renew --post-hook "systemctl restart nginx && /root/SSL_BACKUP.sh"
+  # --------------------------------------------
 
   ssl_session_timeout 1d;
   ssl_session_cache shared:MozSSL:10m; # about 40000 sessions
@@ -687,67 +681,6 @@ If successful, restart
 systemctl restart nginx
 ```
 
-## Serve static files with Nginx
-
-You can server static files using Node.js, however Nginx performs this function much, much faster. 
-
-- Check that nginx can execute/cd into the static folder
-- give nginx the permission to read the static folder
-```sh
-namei -om /absolute/path/to/static/folder
-```
-- `namei`: Follow a pathname until a terminal point is found.
-- `-m`: show the mode bits of each file
-- `-o`: show owner and group name of each file
-
-Here is an example: 
-```sh
-# Output
-namei -om /home/mike/myNginx/public/
-f: /home/mike/myNginx/public/
- dr-xr-xr-x root root /
- drwxr-xr-x root root home
- drwx------ mike mike mike
- drwxrwxr-x mike mike myNginx
- drwxrwxr-x mike mike public
-```
-
-You must modify the permissions for the following directory: 
-```sh
-
-drwx------ mike mike mike
-
-# If the permissions on the absolute path do not
-# allow nginx to reach the folder do this:
-
-# Change the group of problematic directory for
-# to nginx
-chowm user:nginx /path/to/folder
-# chown : change file owner and group
-
-# Give the nginx group permission to execute
-chmod g+x /path/to/static/folder
-# chmod : change file mode bits
-# g : group
-# +x : add permission to execute
-
-# Fixed example outputs:
-chown mike:nginx /home/mike
-chmod g+x /home/mike/
-namei -om /home/mike/myNginx/public/
-f: /home/mike/myNginx/public/    
- dr-xr-xr-x root root  /
- drwxr-xr-x root root  home      
- drwx--x--- mike nginx mike      
- drwxrwxr-x mike mike  myNginx   
- drwxrwxr-x mike mike  public  
-
-# Notice how mike's directory changed from
-drwx------ mike nginx mike
-# to 
-drwx--x--- mike nginx mike
-```
-
 ### Generate SSL certificates using certbot
 
 The `--webroot` authentication method stores a file in the public folder of your app and tries to retrieve it in their end on port 80 of your server. If the file can be retrieved you have proved to be the owner of the domain.
@@ -756,27 +689,70 @@ The `--webroot` authentication method stores a file in the public folder of your
 $ certbot certonly --webroot -d <insert-domain.com> -w /path/to/static-files/directory
 ```
 - `certonly`: Generate the ssl_certificate and ssl_certificate_key without making any changes to our .conf file
-- `--webroot`: 
-- `-d`: Domain
+- `--webroot`: Place files in a server's webroot folder for authentication 
+- `-d`: Comma-separated list of domains to obtain a certificate for
 - `-w`: Absolute path to the static folder of your app. 
 
 
-
-  Fill in the <insert-domain.com> as seen below
-  $ vim /etc/nginx/conf.d/yourNginx.conf
-
-```sh
-certbot certonly --webroot -d <insert-domain.com> -w /path/to/public/directory
-```
-
-
-### Schedule a task using crontab
+### Automatically renew your SSL certificates using `crontab`
 
 ```sh
 crontab -e
 ```
+```sh
+# ┌ minute (0 - 59)
+# │ ┌ hour (0 - 23)
+# │ │ ┌ day of month (1 - 31)
+# │ │ │ ┌ month (1 - 12)
+# │ │ │ │ ┌ day of week (0 - 6) (Sunday to Saturday;
+# │ │ │ │ │                      7 is also Sunday on some systems)
+# │ │ │ │ │
+# * * * * *  command_to_execute
+
+# USEFUL WEBSITE TO CREATE CRONJOBS
+# https://crontab.guru/
+
+# Check if SSL certificate needs to be renewed everyday at 3AM
+0 3 * * * certbot renew --post-hook "systemctl reload nginx && /root/SSH_BACKUP.sh"
+```
 
 Check crontab log file
 ```sh
-tail /var/log/cron
+less /var/log/cron | grep certbot
 ```
+
+---
+### Network intefaces
+
+
+Interface configuration
+```sh
+ifconfig 
+```
+
+View open ports using netstat
+```sh
+netstat -tln 
+```
+
+- `-t`: Only TCP
+- `-l`: Ports that are listening
+- `-n`: IPs as numbers, not hostnames
+
+Expected output:
+
+```
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 127.0.0.1:8080          0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:443             0.0.0.0:*               LISTEN
+tcp6       0      0 :::80                   :::*                    LISTEN
+tcp6       0      0 :::22                   :::*                    LISTEN
+tcp6       0      0 :::443                  :::*                    LISTEN
+```
+This command is really important when debugging your application. Whenever you can't reach your app, check your ports. 
+
+---
+
