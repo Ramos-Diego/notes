@@ -126,3 +126,9 @@ WORKDIR - A very convenient way to define the working directory, it will be used
 EXPOSE - An important instruction to inform your users about the ports your application is listening on.
 
 ONBUILD - give more flexibility to your team and clients.
+
+Dangerous command to delete all unused images, networks, stopped containers and all build cache:
+
+```sh
+docker system prune -a
+```

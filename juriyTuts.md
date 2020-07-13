@@ -80,6 +80,13 @@ sudo apt-get install net-tools
 # As root Amazon Linux
 curl -sL https://rpm.nodesource.com/setup_14.x | bash -
 
+## Run `sudo yum install -y nodejs` to install Node.js 14.x and npm.
+## You may also need development tools to build native addons:
+     sudo yum install gcc-c++ make
+## To install the Yarn package manager, run:
+     curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+     sudo yum install yarn
+
 # Using Ubuntu
 curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 sudo apt-get install -y nodejs

@@ -15,8 +15,6 @@ sudo systemctl start mysql && \
 sudo systemctl enable mysql && \
 sudo systemctl status mysql
 
-
-
 https://www.w3schools.com/nodejs/nodejs_mysql.asp
 
 ## Install mysql in Amazon Linux

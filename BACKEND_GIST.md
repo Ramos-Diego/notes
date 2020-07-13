@@ -2,6 +2,13 @@
 
 Even though AWS has tools such as Elastic Beanstalk, which automates and enables our apps to be managed using a GUI, by performing a manual setup you gain a better understanding of Elastic Beastalk and the ability to deploy an app from any other service provider. You could even follow these steps to run an app in a Raspberry Pi. The sky is the limit.
 
+STEP BY STEP
+
+1. Launch server (AWS), buy domain and setup DNS (NameCheap).
+2. Install all the software (nodejs, yarn, gcc-c++, docker, docker-compose, nginx, certbot)
+3. Run custom docker-compose
+4. Setup certbot autorenewal
+
 ## Topics
 
 - Amazon Web Services (AWS)
@@ -489,7 +496,6 @@ vim /etc/nginx/nginx.conf
 
 # NGINX CONFIGURATION
 
-Feel free to delete comments if you decide to use this configuration and your understand what is happening. 
 ```
 # THIS FILE: /etc/nginx/conf.d/yourNginx.conf
 
@@ -610,8 +616,10 @@ server {
   ssl_session_cache shared:MozSSL:10m; # about 40000 sessions
   ssl_session_tickets off;
 
-  # $ curl https://ssl-config.mozilla.org/ffdhe2048.txt > /path/to/dhparam
-  # ssl_dhparam /path/to/dhparam;
+  # --------------------------------------------
+  # $ openssl dhparam -out /etc/ssl/certs/dhparam-2048.pem 2048
+  # --------------------------------------------
+  ssl_dhparam /etc/ssl/certs/dhparam-2048.pem;
 
   # intermediate configuration
   ssl_protocols TLSv1.2 TLSv1.3;
@@ -622,10 +630,8 @@ server {
   add_header Strict-Transport-Sec urity "max-age=63072000" always;
 
   # OCSP stapling (Optional for faster handshake)
-  # ssl_stapling on;
-  # ssl_stapling_verify on;
-  # verify chain of trust of OCSP response using Root CA and Intermediate certs
-  # ssl_trusted_certificate /path/to/root_CA_cert_plus_intermediates;
+  ssl_stapling on;
+  ssl_stapling_verify on;
 
   # replace with the IP address of your resolver
   resolver 1.1.1.1;
@@ -686,7 +692,7 @@ systemctl restart nginx
 The `--webroot` authentication method stores a file in the public folder of your app and tries to retrieve it in their end on port 80 of your server. If the file can be retrieved you have proved to be the owner of the domain.
 
 ```bash
-$ certbot certonly --webroot -d <insert-domain.com> -w /path/to/static-files/directory
+certbot certonly --webroot -d <insert-domain.com> -w /home/<insert-non-root-user>/webroot
 ```
 - `certonly`: Generate the ssl_certificate and ssl_certificate_key without making any changes to our .conf file
 - `--webroot`: Place files in a server's webroot folder for authentication 
