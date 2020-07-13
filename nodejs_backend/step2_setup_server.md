@@ -90,6 +90,11 @@ yum install -y yarn
 ```
 **Yarn** is a faster and improved alternative to NPM.
 
+Install **PM2**
+```
+yarn global add pm2
+```
+
 Install **Docker**
 ```sh
 amazon-linux-extras install -y docker
@@ -129,12 +134,20 @@ docker-compose --version
 yum -y update && \
 amazon-linux-extras install -y epel docker && \
 curl -sL https://rpm.nodesource.com/setup_14.x | bash - && \
+curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo && \
 yum install -y nodejs gcc-c++ make nginx certbot yarn docker && \
+yarn global add pm2 && \
 sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
 chmod +x /usr/local/bin/docker-compose && \
 systemctl start docker nginx && \
 systemctl enable docker nginx && \
-yum list installed | egrep 'vim|net-tools|nodejs|yarn|gcc-c++|docker|nginx|certbot' && \
-docker-compose --version && \
+yum list installed | egrep 'net-tools|nodejs|yarn|gcc-c++|docker|nginx|certbot' && \
 systemctl status docker nginx | egrep 'Active|docker.service -|nginx.service -'
+```
+
+Log in as non-root user and confirm PM2 and docker-compose are installed
+
+```sh
+pm2 -v && \
+docker-compose -v
 ```
