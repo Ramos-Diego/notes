@@ -10,6 +10,11 @@ Add an user
 adduser <insert-username>
 ```
 
+Add user to the `docker` group to use docker without `sudo`
+```sh
+usermod -aG docker <insert-username>
+```
+
 Switch to the new user
 ```sh
 sudo su -l <insert-username>
@@ -22,7 +27,7 @@ whoami
 ```
 
 ---
-See if your nginx is working by going to the domain you set up previously.
+See if your nginx is working by going to the DNS you set up previously.
 
 Find the nginx default root directory
 ```sh
@@ -52,32 +57,37 @@ openssl dhparam -out /etc/ssl/certs/dhparam-2048.pem 2048
 
 ---
 
+clone github project
+```sh
+git clone
+```
+
 Add, edit `myNginx.conf` and replace the placeholders
 You must setup for HTTP first, then HTTPS
 ```sh
 nano /etc/nginx/conf.d/myNginx.conf
 ```
 
-All the lines that must be edited have `# EDIT HERE` at the end.
-```sh
-server_name www.example.com example.com; # EDIT HERE
-```
-
 Test you made no mistakes on `myNginx.conf`
 ```sh
 nginx -t
 ```
-
-Correct output
 ```sh
+# --------------------------------------------
+# CORRECT OUTPUT:
 # nginx: the configuration file /etc/nginx/nginx.conf syntax is ok  
 # nginx: configuration file /etc/nginx/nginx.conf test is successful
+# --------------------------------------------
 ```
 
 Restart nginx
 ```sh
-systemctl restart nginx && \
-systemctl status nginx
+systemctl restart nginx
+```
+
+Check nginx status
+```sh
+systemctl status nginx | egrep 'Active|nginx.service -'
 ```
 
 ## TODO: Find better approach for this

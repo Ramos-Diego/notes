@@ -95,9 +95,33 @@ Install **PM2**
 yarn global add pm2
 ```
 
+Install **Docker**
+```sh
+amazon-linux-extras install -y docker
+```
+```sh
+yum install -y docker
+```
+```sh
+systemctl start docker && \
+systemctl enable docker && \
+systemctl status docker
+```
+
+Install docker-compose
+
+```sh
+sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+```
+
+Apply executable permissions to the binary
+```sh
+chmod +x /usr/local/bin/docker-compose
+```
+
 Verify you have the following programs are installed
 ```sh
-yum list installed | egrep 'vim|net-tools|nodejs|yarn|gcc-c++|nginx|certbot'
+yum list installed | egrep 'vim|net-tools|nodejs|yarn|gcc-c++|docker|nginx|certbot'
 ```
 
 ---
@@ -105,18 +129,22 @@ yum list installed | egrep 'vim|net-tools|nodejs|yarn|gcc-c++|nginx|certbot'
 **Installations combined for AMAZON LINUX 2**
 ```sh
 yum -y update && \
+amazon-linux-extras install -y epel docker && \
 curl -sL https://rpm.nodesource.com/setup_14.x | bash - && \
 curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo && \
-yum install -y nodejs gcc-c++ make nginx certbot yarn && \
+yum install -y nodejs gcc-c++ make nginx certbot yarn docker && \
 yarn global add pm2 && \
-systemctl start nginx && \
-systemctl enable nginx && \
-yum list installed | egrep 'net-tools|nodejs|yarn|gcc-c++|nginx|certbot' && \
-systemctl status nginx
+sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
+chmod +x /usr/local/bin/docker-compose && \
+systemctl start docker nginx && \
+systemctl enable docker nginx && \
+yum list installed | egrep 'net-tools|nodejs|yarn|gcc-c++|docker|nginx|certbot' && \
+systemctl status docker nginx | egrep 'Active|docker.service -|nginx.service -'
 ```
 
-Log in as non-root user and confirm PM2 is installed
+Log in as non-root user and confirm PM2 and docker-compose are installed
 
 ```sh
-pm2 -v
+pm2 -v && \
+docker-compose -v
 ```
