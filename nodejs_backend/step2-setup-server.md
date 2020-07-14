@@ -8,12 +8,12 @@ chmod 400 /path/to/key.pem
 
 SSH into EC2 instance for the first time:
 ```sh
-sudo ssh -i /path/to/<SSH-key>.pem ec2-user@<insert-public-ip>
+sudo ssh -i /path/to/[SSH-key].pem ec2-user@[insert-public-ip]
 ```
 
 Make an alias to SSH into EC2 instance
 ```sh
-echo "alias ec2='sudo ssh -i /path/to/<key-name>.pem ec2-user@<insert-public-ip>'" >> ~/.bash_aliases
+echo "alias ec2='sudo ssh -i /path/to/[key-name].pem ec2-user@[insert-public-ip]'" >> ~/.bash_aliases
 ```
 
 From this point use the alias to remote into the EC2 instance

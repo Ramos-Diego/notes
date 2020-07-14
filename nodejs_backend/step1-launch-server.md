@@ -8,17 +8,16 @@ Login to AWS
     Note: The name of the instance can be different based on region. Simply choose **(Free tier eligible)**
     3. Configure Instance Details > **Good as defualt**
     4. Add Storage > **Good as defualt**
-    5. Add Tags > **Good as defualt**
+    5. Add Tags > **Good as defualt** 
     6. Configure Security Group > Add the following rules:
     
     Get your public IP: https://api.ipify.org/
-    ```
+
     | Type  | Protocol | Port range | Source (CIDR blocks) | Description   |
     |-------|----------|------------|----------------------|---------------|
     | HTTP  | TCP      | 80         | 0.0.0.0/0            | HTTP          |
-    | SSH   | TCP      | 22         | <your-public-ip>/24  | ADMIN SSH     |
+    | SSH   | TCP      | 22         | [your-public-ip]/24  | ADMIN SSH     |
     | HTTPS | TCP      | 443        | 0.0.0.0/0            | HTTPS         |
-    ```
 
     7. Review all the settings and launch the EC2 instance
 
@@ -50,9 +49,8 @@ Login to AWS
     6. In the left bar go to Instances > **Intances**
     7. Copy the **Public DNS (IPv4)** and **IPv4 Public IP** from the instance's description
     8. Go back to NameCheap and match the following table:
-    ```
+   
     | Type         | Host | Value                                       |
     |--------------|------|---------------------------------------------|
     | A Record     |   @  | IPv4 Public IP [123.123.123.123]            |
     | CNAME Record |  www | Public DNS (IPv4) [some_link.amazonaws.com] |
-    ```

@@ -1,5 +1,5 @@
 const express = require('express')
-const app = express() // initialize express
+const app = express()
 const { join } = require('path')
 
 // Set a static folder
