@@ -10,10 +10,26 @@ SSH into EC2 instance for the first time:
 ```sh
 sudo ssh -i /path/to/[SSH-key].pem ec2-user@[insert-public-ip]
 ```
+Type `yes` to permanently add the fingerprint.
 
 Make an alias to SSH into EC2 instance
 ```sh
 echo "alias ec2='sudo ssh -i /path/to/[key-name].pem ec2-user@[insert-public-ip]'" >> ~/.bash_aliases
+```
+
+If you make a mistake edit this file
+```sh
+nano ~/.bash_aliases
+```
+
+or 
+```sh
+alias ec2='sudo ssh -i /path/to/[key-name].pem ec2-user@[insert-public-ip]'
+```
+
+If you make a mistake edit this file
+```sh
+nano ~/.bashrc
 ```
 
 From this point use the alias to remote into the EC2 instance
@@ -21,10 +37,6 @@ From this point use the alias to remote into the EC2 instance
 ec2
 ```
 
-If you make any mistake edit the file
-```sh
-vim ~/.bash_aliases
-```
 
 ## Update and install
 
@@ -66,6 +78,11 @@ Install **certbot**
 yum install -y certbot
 ```
 
+Install **Git**
+```sh
+yum install -y git
+```
+
 Install **Node.js**
 
 ```sh
@@ -97,7 +114,7 @@ yarn global add pm2
 
 Verify you have the following programs are installed
 ```sh
-yum list installed | egrep 'vim|net-tools|nodejs|yarn|gcc-c++|nginx|certbot'
+yum list installed | egrep 'net-tools|nodejs|yarn|gcc-c++|nginx|certbot|git'
 ```
 
 ---
@@ -107,11 +124,11 @@ yum list installed | egrep 'vim|net-tools|nodejs|yarn|gcc-c++|nginx|certbot'
 yum -y update && \
 curl -sL https://rpm.nodesource.com/setup_14.x | bash - && \
 curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo && \
-yum install -y nodejs gcc-c++ make nginx certbot yarn && \
+yum install -y nodejs git gcc-c++ make nginx certbot yarn && \
 yarn global add pm2 && \
 systemctl start nginx && \
 systemctl enable nginx && \
-yum list installed | egrep 'net-tools|nodejs|yarn|gcc-c++|nginx|certbot' && \
+yum list installed | egrep 'net-tools|nodejs|yarn|gcc-c++|nginx|certbot|git' && \
 systemctl status nginx
 ```
 
