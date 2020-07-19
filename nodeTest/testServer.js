@@ -1,12 +1,8 @@
 const express = require('express')
 const app = express()
-const { join } = require('path')
-
-// Set a static folder
-app.use(express.static(join(__dirname, 'public')))
 
 // Render test page
-app.get('/', (req, res) => res.render('index.html'))
+app.get('/', (req, res) => res.send('<h1>Hello Jeff!</h1>'))
 
-// Start listening on port 8080
-app.listen(8080)
+// Start listening on port 3000
+app.listen(3000, 'localhost')

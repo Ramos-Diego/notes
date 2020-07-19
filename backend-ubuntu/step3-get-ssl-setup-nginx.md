@@ -9,12 +9,13 @@ See if your nginx is working by going to the domain you set up previously. www.e
 
 Find the nginx default root directory
 ```sh
-cat /etc/nginx/nginx.conf | grep root
+cat /etc/nginx/sites-available/default | grep root
 ```
 
 Get certificates
 ```sh
-certbot certonly --webroot --register-unsafely-without-email --agree-tos -d [insert-domain.com] -w nginx/default/root/directory
+certbot certonly --webroot --register-unsafely-without-email --agree-tos -w /var/www/html \
+-d [insert-domain.com]
 ```
 `/var/www/html` is the default nginx root directory for Ubuntu 18. May vary in other linux distros.
 
@@ -26,7 +27,7 @@ openssl dhparam -out /etc/ssl/certs/dhparam-2048.pem 2048
 
 Add, edit `myNginx.conf` and replace the placeholders
 ```sh
-nano /etc/nginx/conf.d/myNginx.conf
+nano /etc/nginx/sites-available/default
 ```
 
 All the lines that must be edited have `# EDIT HERE` at the end.
