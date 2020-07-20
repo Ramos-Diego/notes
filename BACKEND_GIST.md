@@ -274,7 +274,6 @@ ls -lRa ~/. | egrep '.ssh|authorized_keys'
 
 **All in one command**
 ```sh
-adduser <insert-username> && \
 mkdir ~/.ssh && \
 chmod 700 ~/.ssh && \
 touch ~/.ssh/authorized_keys && \

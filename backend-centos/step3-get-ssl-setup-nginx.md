@@ -5,30 +5,34 @@ Become root
 sudo su
 ```
 
-See if your nginx is working by going to the domain you set up previously. www.example.com
-
-Find the nginx default root directory
-```sh
-cat /etc/nginx/sites-available/default | grep root
-```
+See if your nginx is working by going to the public IP of your server.
 
 Get certificates
 ```sh
-certbot certonly --webroot --register-unsafely-without-email --agree-tos -w /var/www/html \
--d [insert-domain.com] \
--d [www.insert-domain.com]
+certbot certonly --webroot --register-unsafely-without-email --agree-tos -w /usr/share/nginx/html \
+-d [insert-domain.com] -d [www.insert-domain.com]
 ```
-`/var/www/html` is the default nginx root directory for Ubuntu 18. May vary in other linux distros.
+`/usr/share/nginx/html` is the default nginx root directory for CentOS 8. May vary in other linux distros.
 
+
+If needed, find the nginx default `root` directory
+```sh
+cat /etc/nginx/nginx.conf | grep root
+```
 
 Get DH Parameters for SSL
 ```sh
 openssl dhparam -out /etc/nginx/dhparam.pem 2048
 ```
 
+Edit `nginx.conf`
+```sh
+nano /etc/nginx/nginx.conf
+```
+
 Add, edit `myNginx.conf` and replace the placeholders
 ```sh
-nano /etc/nginx/sites-available/default
+nano /etc/nginx/conf.d/example.com.conf
 ```
 
 All the lines that must be edited have `# EDIT HERE` at the end.
