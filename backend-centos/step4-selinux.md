@@ -1,10 +1,3 @@
-
-## SELinux
-
-SELinux is a Linux kernel security module that provides a mechanism for supporting access control security policies. It is known to be complicated, but you don't need to know all the details to use it.
-
-SELinux configuration [article](https://www.digitalocean.com/community/tutorials/an-introduction-to-selinux-on-centos-7-part-1-basic-concepts), [video](https://www.youtube.com/watch?v=HhydNtaLEK0&list=PLQlWzK5tU-gDyxC1JTpyC2avvJlt3hrIh&index=9)
-
 ## Serve static files with Nginx and SELinux
 
 You can server static files using Node.js, however Nginx performs this function much, much faster. To enable this while `enforcing` SELinux we do the following:
@@ -70,6 +63,11 @@ drwx------ mike mike mike
 drwx--x--- mike nginx mike
 ```
 ---
+## SELinux
+
+SELinux is a Linux kernel security module that provides a mechanism for supporting access control security policies. It is known to be complicated, but you don't need to know all the details to use it.
+
+SELinux configuration [article](https://www.digitalocean.com/community/tutorials/an-introduction-to-selinux-on-centos-7-part-1-basic-concepts), [video](https://www.youtube.com/watch?v=HhydNtaLEK0&list=PLQlWzK5tU-gDyxC1JTpyC2avvJlt3hrIh&index=9)
 
 Check if SELinux is installed and **enforced**
 ```sh
@@ -112,13 +110,13 @@ getenforce
 ---
 Once SELinux is enforced we need to make changes to enable http requests to our server:
 
-Allow HTTP servers to connect to other backends
+Allow HTTP servers to connect to other backends. In other words, allow your app running on localhost:[PORT] to respond through nginx.
 ```sh
 setsebool -P httpd_can_network_connect on
 ```
 - `-P`: persist change
 
-Allow HTTP servers to read files from user home directory
+Allow HTTP servers to read files from user home directory. In other words, enables static files to be served by nginx.
 ```sh
 setsebool -P httpd_enable_homedirs on
 ```
@@ -126,21 +124,19 @@ setsebool -P httpd_enable_homedirs on
 Change the context of the static folder and its files to be accessible. In other words, enable your static files to be served by **Nginx**.
 
 ```sh
-chcon -Rt httpd_sys_content_t /path/to/static/folder
+chcon -Rt httpd_sys_content_t /path/to/example.com/public
 ```
 - `-R`: Recursive change
 - `-t`: Change directory/file TYPE
 
 from
-<pre>
-<code>
--rw-rw-r--. jeff jeff system_u:object_r:<mark><b>user_home_t</b></mark>:s0 index.html
-</code>
-</pre>
+```sh
+-rw-rw-r--. jeff jeff system_u:object_r:user_home_t:s0 index.html
+```
 to
-<pre>
--rw-rw-r--. jeff jeff system_u:object_r:<mark><b>httpd_sys_content_t</b></mark>:s0 index.html
-</pre>
+```sh
+-rw-rw-r--. jeff jeff system_u:object_r:httpd_sys_content_t:s0 index.html
+```
 
 Check the context details for files and directories
 ```sh

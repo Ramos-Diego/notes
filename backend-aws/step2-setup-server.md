@@ -49,7 +49,7 @@ If you're following this tutorial for another Linux distribution, run this comma
 ```sh
 cat /etc/*release | grep 'ID_LIKE'
 ```
-In Amazon Linux you should see: `ID_LIKE="rhel fedora"`.
+In Amazon Linux 2 you should see: `ID_LIKE="centos rhel fedora"`.
 
 Update your EC2 instance
 ```sh
@@ -112,24 +112,23 @@ Install **PM2**
 yarn global add pm2
 ```
 
-Verify you have the following programs are installed
-```sh
-yum list installed | egrep 'net-tools|nodejs|yarn|gcc-c++|nginx|certbot|git'
-```
-
 ---
 
 **Installations combined for AMAZON LINUX 2**
 ```sh
 yum -y update && \
+amazon-linux-extras install -y epel &&\
 curl -sL https://rpm.nodesource.com/setup_14.x | bash - && \
 curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo && \
 yum install -y nodejs git gcc-c++ make nginx certbot yarn && \
 yarn global add pm2 && \
 systemctl start nginx && \
-systemctl enable nginx && \
-yum list installed | egrep 'net-tools|nodejs|yarn|gcc-c++|nginx|certbot|git' && \
-systemctl status nginx
+systemctl enable nginx
+```
+
+Verify you have the following programs are installed
+```sh
+yum list installed | egrep 'net-tools|nodejs|yarn|gcc-c++|nginx|certbot|git'
 ```
 
 Log in as non-root user and confirm PM2 is installed

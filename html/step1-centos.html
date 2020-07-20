@@ -1,0 +1,64 @@
+<p>In this case I will be using DigitalOcean to host a CentOS server.</p>
+<ol>
+<li><p>Spin up server</p>
+<ol>
+<li>In the navigation bar go to Creat &gt; <strong>Droplet</strong></li>
+<li>Choose an image &gt; Distribution &gt; <strong>CentOS 8.2 x64</strong></li>
+<li>Choose a plan</li>
+<li>Add block storage <strong>(Skip)</strong></li>
+<li>Choose a data close to you</li>
+<li>Add SSH Key<ol>
+<li>Generate public and private keys in the local machine<pre><code class="lang-sh"> ssh-keygen -t rsa -<span class="hljs-selector-tag">b</span> <span class="hljs-number">4096</span>
+</code></pre>
+ Use default directory and filename. Password is optional.</li>
+<li>Transfer public key to the server<pre><code class="lang-sh"> ssh-<span class="hljs-keyword">copy</span>-<span class="hljs-built_in">id</span> username@[insert-ip]
+</code></pre>
+ DigitalOcean gives you the option to enter the content of the public key in the web user interface. If you do this, skip this step.</li>
+<li>Disable password authentication in the server<pre><code class="lang-sh"> nano <span class="hljs-regexp">/etc/</span>ssh<span class="hljs-regexp">/sshd_config</span>
+</code></pre>
+ Set the following line to <code>no</code>:<pre><code class="lang-sh"> <span class="hljs-attribute">PasswordAuthentication</span> <span class="hljs-literal">no</span>
+</code></pre>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>Setup DNS with Namecheap</p>
+<ol>
+<li>Log into NameCheap.com</li>
+<li>Buy a domain and go to your NameCheap dashboard &gt; Domain List &gt; select a domain name &gt; <strong>manage</strong></li>
+<li>In the top bar select <strong>Advanced DNS</strong> &gt; Under <strong>host records</strong> you should see 2 entries with “@” and “www”</li>
+<li>Switch to DigitalOcean</li>
+<li>Copy the <strong>Public IP IPv4</strong> from the droplet&#39;s description</li>
+<li><p>Go back to NameCheap and match the following table:</p>
+  <table>
+    <tr>
+        <td>Type</td>
+        <td>Host</td>
+        <td>Value</td>
+    </tr>
+    <tr>
+        <td>A Record</td>
+        <td>@</td>
+        <td>IPv4 Public IP [123.123.123.123]</td>
+    </tr>
+    <tr>
+        <td>A Record</td>
+        <td>www</td>
+        <td>IPv4 Public IP [123.123.123.123]</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+</li>
+</ol>
+</li>
+</ol>

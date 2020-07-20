@@ -43,10 +43,10 @@ systemctl status nginx
 
 Install **certbot**
 ```sh
-apt-get install software-properties-common && \
+apt install software-properties-common && \
 add-apt-repository universe && \
-apt-get update && \
-apt-get install certbot python3-certbot-nginx -y
+apt update && \
+apt install -y certbot 
 ```
 
 Install **Git**
@@ -58,12 +58,12 @@ Install **Node.js**
 
 ```sh
 curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - && \
-apt-get install -y nodejs
+apt install -y nodejs
 ```
 
 Install **Development tools** (for Node.js)
 ```sh
-apt-get install -y gcc g++ make
+apt install -y gcc g++ make
 ```
 
 Install **Yarn**
@@ -71,7 +71,7 @@ Install **Yarn**
 ```sh
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list && \
-apt-get update && apt-get install -y yarn
+apt update && apt install -y yarn
 ```
 
 **Yarn** is a faster and improved alternative to NPM.
@@ -94,10 +94,10 @@ apt update && apt upgrade -y && \
 curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - && \
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list && \
-apt-get install software-properties-common && \
+apt install software-properties-common && \
 add-apt-repository universe && \
-apt-get update && \
-apt install -y nodejs net-tools nginx git gcc g++ make certbot python3-certbot-nginx yarn && \
+apt update && \
+apt install -y nodejs net-tools nginx git gcc g++ make certbot yarn && \
 yarn global add pm2 && \
 systemctl start nginx && \
 systemctl enable nginx && \
@@ -108,62 +108,4 @@ Log in as non-root user and confirm PM2 is installed
 
 ```sh
 pm2 -v
-```
-
-Enable firewall
-
-```sh
-ufw app list
-```
-You should see the following apps
-
-```sh
-Nginx Full
-Nginx HTTP
-Nginx HTTPS
-OpenSSH
-```
-
-```sh
-ufw allow 'Nginx Full'
-```
-This will open port :80 (HTTP) and :443 (HTTPS)
-
-```sh
-ufw allow OpenSSH
-```
-This will open port 22 anywhere 0.0.0.0
-
-```sh
-ufw enable
-```
-
-Check if the setup is correct
-```sh
-ufw status
-```
-
-Correct ouput
-```
-To                         Action      From
---                         ------      ----
-OpenSSH                    ALLOW       Anywhere                  
-Nginx Full                 ALLOW       Anywhere                  
-OpenSSH (v6)               ALLOW       Anywhere (v6)             
-Nginx Full (v6)            ALLOW       Anywhere (v6)
-```
-
-Double check with `netstat`
-```sh
-netstat -tln
-```
-
-You should see the following
-```
-Active Internet connections (only servers)
-Proto Recv-Q Send-Q Local Address           Foreign Address         State      
-tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN     
-tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN     
-tcp6       0      0 :::80                   :::*                    LISTEN     
-tcp6       0      0 :::22                   :::*                    LISTEN     
 ```

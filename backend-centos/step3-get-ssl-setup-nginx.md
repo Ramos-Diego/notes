@@ -1,19 +1,17 @@
 ## Configure non-root user
 
-Become root
-```sh
-sudo su
-```
+Check that nginx is working by going your server's public IP in the browser. If not check :
+  1. Nginx is running: `systemctl status nginx`
+  2. Port `:80` is open in your droplet: `ss -tln`
 
-See if your nginx is working by going to the public IP of your server.
-
+---
 Get certificates
 ```sh
-certbot certonly --webroot --register-unsafely-without-email --agree-tos -w /usr/share/nginx/html \
--d [insert-domain.com] -d [www.insert-domain.com]
+certbot certonly --webroot --email your@email.com --no-eff-email --agree-tos -w /usr/share/nginx/html -d [insert-domain.com] -d [www.insert-domain.com]
 ```
 `/usr/share/nginx/html` is the default nginx root directory for CentOS 8. May vary in other linux distros.
 
+Note: `--register-unsafely-without-email` is an option.
 
 If needed, find the nginx default `root` directory
 ```sh
@@ -37,7 +35,7 @@ nano /etc/nginx/conf.d/example.com.conf
 
 All the lines that must be edited have `# EDIT HERE` at the end.
 ```sh
-server_name www.example.com example.com; # EDIT HERE
+server_name example.com; # EDIT HERE
 ```
 
 Test you made no mistakes on `myNginx.conf`
@@ -77,6 +75,11 @@ crontab -e
 
 # Check if SSL certificate needs to be renewed everyday at 3AM
 0 3 * * * certbot renew --post-hook "systemctl restart nginx"
+```
+
+Verify that cronjob is running by reading the cron logs
+```
+tail /var/log/cron
 ```
 
 ---

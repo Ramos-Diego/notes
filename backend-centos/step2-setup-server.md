@@ -1,52 +1,41 @@
 SSH into server
 
 ```sh
-ssh [insert-user]@[insert-ip]
+ssh [insert-user]@[insert-ip-or-domain]
 ```
 To login for the first time in DigitaOcean use `root` as user.
 
 ## Update and install
 
-Become root to setup server faster without sudo
+Update your droplet
 ```sh
-sudo su
-```
-
-If you're following this tutorial for another Linux distribution, run this command to see what kind of distro you're running.
-```sh
-cat /etc/*release | grep 'ID_LIKE'
-```
-In Amazon Linux you should see: `ID_LIKE="rhel fedora"`.
-
-Update your EC2 instance
-```sh
-yum -y update
+dnf -y update
 ```
 - `-y`: Don't ask for confirmation
 
 Install **nano**
 ```sh
-yum install -y nano
+dnf install -y nano
 ```
 
 Install **firewalld**
 ```sh
-dnf install firewalld
+dnf install -y firewalld
 ```
 
-start firewalld automatically on system restart
+start `firewalld` automatically on system restart
 ```sh
-systemctl start nginx && \
-systemctl enable nginx && \
-systemctl status nginx
+systemctl start firewalld && \
+systemctl enable firewalld && \
+systemctl status firewalld
 ```
 
 Install **NGINX**
 ```sh
-yum install -y nginx
+dnf install -y nginx
 ```
 
-start nginx automatically on system restart
+start `nginx` automatically on system restart
 ```sh
 systemctl start nginx && \
 systemctl enable nginx && \
@@ -55,40 +44,32 @@ systemctl status nginx
 
 Install **certbot**
 
-[Extra Packages for Enterprise Linux (EPEL)](https://fedoraproject.org/wiki/EPEL#Quickstart)
+Extra Packages for Enterprise Linux (EPEL)
+```sh
+dnf install -y epel-release
+```
 
-RHEL/CentOS 8:
-```sh
-yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-```
-on RHEL 8 it is required to also enable the codeready-builder-for-rhel-8-*-rpms repository since EPEL packages may depend on packages from it:
-```sh
-yum install -y subscription-manager \
-ARCH=$( /bin/arch ) \
-subscription-manager repos --enable "codeready-builder-for-rhel-8-${ARCH}-rpms"
-```
 certbot
 ```sh
-dnf install -y certbot python3-certbot-nginx
+dnf install -y certbot
 ```
 
 Install **Git**
 ```sh
-yum install -y git
+dnf install -y git
 ```
 
 Install **Node.js**
-
 ```sh
 curl -sL https://rpm.nodesource.com/setup_14.x | bash -
 ```
 ```sh
-yum install -y nodejs
+dnf install -y nodejs
 ```
 
 Install **Development tools** (for Node.js)
 ```sh
-yum install -y gcc-c++ make
+dnf install -y gcc-c++ make
 ```
 
 Install **Yarn**
@@ -97,7 +78,7 @@ Install **Yarn**
 curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
 ```
 ```sh
-yum install -y yarn
+dnf install -y yarn
 ```
 **Yarn** is a faster and improved alternative to NPM.
 
@@ -106,30 +87,27 @@ Install **PM2**
 yarn global add pm2
 ```
 
-Verify you have the following programs are installed
+Verify the following programs are installed
 ```sh
-yum list installed | egrep 'net-tools|nodejs|yarn|gcc-c++|nginx|certbot|git'
+dnf list installed | egrep 'net-tools|nodejs|yarn|gcc-c++|nginx|make|certbot|git|firewalld'
 ```
 
+Verify PM2 is installed
+
+```sh
+pm2 -v
+```
 ---
 
 **Installations combined for CentOS**
 ```sh
-yum -y update && \
+dnf -y update && \
 curl -sL https://rpm.nodesource.com/setup_14.x | bash - && \
 curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo && \
-yum install -y nodejs git gcc-c++ make nginx certbot yarn && \
+dnf install -y certbot firewalld nodejs nano git gcc-c++ make nginx yarn && \
 yarn global add pm2 && \
-systemctl start nginx && \
-systemctl enable nginx && \
-yum list installed | egrep 'net-tools|nodejs|yarn|gcc-c++|nginx|certbot|git' && \
-systemctl status nginx
-```
-
-Log in as non-root user and confirm PM2 is installed
-
-```sh
-pm2 -v
+systemctl start nginx firewalld && \
+systemctl enable nginx firewalld
 ```
 
 ---
@@ -150,13 +128,13 @@ Check the current `firewalld` default zone and setup
 firewall-cmd --list-all
 ```
 
-Open port :80 (HTTP)
+Open port `:80` (HTTP)
 
 ```sh
 firewall-cmd --zone=public --add-service=http --permanent
 ```
 
-Open port :443 (HTTPS)
+Open port `:443` (HTTPS)
 
 ```sh
 firewall-cmd --zone=public --add-service=https --permanent

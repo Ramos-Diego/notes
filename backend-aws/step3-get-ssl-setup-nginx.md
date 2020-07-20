@@ -1,39 +1,60 @@
 ## Configure non-root user
 
-Become root
-```sh
-sudo su
-```
-
-Add an user
-```sh
-adduser [insert-username]
-```
-
-Switch to the new user
-```sh
-sudo su -l [insert-username]
-```
-- `-, -l, --login`: make the shell a login shell
-
-Verify you're using the right user
-```sh
-whoami
-```
+Check that nginx is working by going your server's public IP in the browser. If not check :
+  1. Nginx is running: `systemctl status nginx`
+  2. Port `:80` is open in your EC2 instance: `ss -tln`
+  3. You have port `:80` open in your security groups for AWS 
 
 ---
-See if your nginx is working by going to the domain you set up previously. www.example.com
+Get certificates
+```sh
+certbot certonly --webroot --email your@email.com --no-eff-email --agree-tos -w /usr/share/nginx/html -d [insert-domain.com] -d [www.insert-domain.com]
+```
+`/usr/share/nginx/html` is the default nginx root directory for Amazon Linux 2. May vary in other linux distros.
 
-Find the nginx default root directory
+Note: `--register-unsafely-without-email` is an option.
+
+If needed, find the nginx default `root` directory
 ```sh
 cat /etc/nginx/nginx.conf | grep root
 ```
 
-Get certificates
+Get DH Parameters for SSL
 ```sh
-certbot certonly --webroot --register-unsafely-without-email --agree-tos -d [insert-domain.com] -w nginx/default/root/directory
+openssl dhparam -out /etc/nginx/dhparam.pem 2048
 ```
-`/usr/share/nginx/html` is the default nginx root directory for Amazon Linux 2. May vary in other linux distros.
+
+Edit `nginx.conf`
+```sh
+nano /etc/nginx/nginx.conf
+```
+
+Add, edit `myNginx.conf` and replace the placeholders
+```sh
+nano /etc/nginx/conf.d/example.com.conf
+```
+
+All the lines that must be edited have `# EDIT HERE` at the end.
+```sh
+server_name example.com; # EDIT HERE
+```
+
+Test you made no mistakes on `myNginx.conf`
+```sh
+nginx -t
+```
+
+Correct output
+```sh
+# nginx: the configuration file /etc/nginx/nginx.conf syntax is ok  
+# nginx: configuration file /etc/nginx/nginx.conf test is successful
+```
+
+Restart nginx
+```sh
+systemctl restart nginx && \
+systemctl status nginx
+```
 
 Set up a cronjob to auto-renew SSL certificates
 ```sh
@@ -57,39 +78,13 @@ crontab -e
 0 3 * * * certbot renew --post-hook "systemctl restart nginx"
 ```
 
-Get DH Parameters for SSL
-```sh
-openssl dhparam -out /etc/ssl/certs/dhparam-2048.pem 2048
+Verify that cronjob is running by reading the cron logs
+```
+tail /var/log/cron
 ```
 
 ---
 
-Add, edit `myNginx.conf` and replace the placeholders
-```sh
-nano /etc/nginx/conf.d/myNginx.conf
-```
-
-All the lines that must be edited have `# EDIT HERE` at the end.
-```sh
-server_name www.example.com example.com; # EDIT HERE
-```
-
-Test you made no mistakes on `myNginx.conf`
-```sh
-nginx -t
-```
-
-Correct output
-```sh
-# nginx: the configuration file /etc/nginx/nginx.conf syntax is ok  
-# nginx: configuration file /etc/nginx/nginx.conf test is successful
-```
-
-Restart nginx
-```sh
-systemctl restart nginx && \
-systemctl status nginx
-```
 
 ## TODO: Find better approach for this
 Create a backup SSL certificates script at /root/SSL_BACKUP.sh

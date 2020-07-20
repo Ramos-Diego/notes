@@ -21,9 +21,17 @@ Create the following folder structure in the home directory
 ```
 node-app
 ├── public
-│   └── index.html
+│   └── test.html
 └── app.js
 ```
+
+Create sample static file (test.html)
+```html
+<!-- ~/node-app/public/test.hmtl -->
+<h1>HELLO! NGINX is serving this static file (test.html)</h1>
+```
+
+This file will be available at `yourDomain.com/test.html`
 
 Create simple test app
 ```javascript
@@ -32,11 +40,12 @@ const express = require('express')
 const app = express()
 
 // Send a message
-app.get('/', (req, res) => res.send('This massage was went from the node app.'))
+app.get('/', (req, res) => res.send('Hello from the Node app running on localhost:8080'))
 
 // Start listening on localhost:8080
 app.listen(8080, 'localhost')
 ```
+This message will be available at `yourDomain.com`
 
 Install dependencies
 ```sh
