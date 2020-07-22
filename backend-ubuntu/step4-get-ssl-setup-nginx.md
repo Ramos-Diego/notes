@@ -14,9 +14,7 @@ cat /etc/nginx/sites-available/default | grep root
 
 Get certificates
 ```sh
-certbot certonly --webroot --register-unsafely-without-email --agree-tos -w /var/www/html \
--d [insert-domain.com] \
--d [www.insert-domain.com]
+certbot certonly --webroot --email your@email.com --no-eff-email --agree-tos -w /var/www/html -d [insert-domain.com] -d [www.insert-domain.com]
 ```
 `/var/www/html` is the default nginx root directory for Ubuntu 18. May vary in other linux distros.
 

@@ -12,12 +12,6 @@ Become root to setup server faster without sudo
 sudo su
 ```
 
-If you're following this tutorial for another Linux distribution, run this command to see what kind of distro you're running.
-```sh
-cat /etc/*release | grep 'ID_LIKE'
-```
-In Ubuntu you should see: `ID_LIKE="debian"`.
-
 Update and upgrade Ubuntu instance
 ```sh
 apt update && apt upgrade -y
@@ -51,7 +45,7 @@ apt install -y certbot
 
 Install **Git**
 ```sh
-apt install git
+apt install -y git
 ```
 
 Install **Node.js**
