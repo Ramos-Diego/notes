@@ -14,7 +14,7 @@ cat /etc/nginx/sites-available/default | grep root
 
 Get certificates
 ```sh
-certbot certonly --webroot --email your@email.com --no-eff-email --agree-tos -w /var/www/html -d [insert-domain.com] -d [www.insert-domain.com]
+certbot certonly --webroot --email your@email.com --no-eff-email --agree-tos -w /var/www/html -d example.com -d www.example.com
 ```
 `/var/www/html` is the default nginx root directory for Ubuntu 18. May vary in other linux distros.
 
@@ -24,14 +24,19 @@ Get DH Parameters for SSL
 openssl dhparam -out /etc/nginx/dhparam.pem 2048
 ```
 
+Edit `nginx.conf`
+```sh
+nano /etc/nginx/nginx.conf
+```
+
 Add, edit `myNginx.conf` and replace the placeholders
 ```sh
-nano /etc/nginx/sites-available/default
+nano /etc/nginx/conf.d/example.com.conf
 ```
 
 All the lines that must be edited have `# EDIT HERE` at the end.
 ```sh
-server_name www.example.com example.com; # EDIT HERE
+server_name example.com; # EDIT HERE
 ```
 
 Test you made no mistakes on `myNginx.conf`
@@ -73,8 +78,12 @@ crontab -e
 0 3 * * * certbot renew --post-hook "systemctl restart nginx"
 ```
 
----
+Verify that cronjob is running by reading the cron logs
+```
+tail /var/log/cron
+```
 
+---
 
 ## TODO: Find better approach for this
 Create a backup SSL certificates script at /root/SSL_BACKUP.sh
