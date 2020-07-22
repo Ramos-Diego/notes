@@ -49,7 +49,7 @@ apt install -y certbot
 
 Install **Git**
 ```sh
-apt install git
+apt install -y git
 ```
 
 Install **Node.js**
