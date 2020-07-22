@@ -43,9 +43,9 @@ OpenSSH (v6)               ALLOW       Anywhere (v6)
 Nginx Full (v6)            ALLOW       Anywhere (v6)
 ```
 
-Double check with `netstat`
+Double check with `ss`
 ```sh
-netstat -tln
+ss -tln
 ```
 
 You should see the following
@@ -56,4 +56,11 @@ tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN
 tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN     
 tcp6       0      0 :::80                   :::*                    LISTEN     
 tcp6       0      0 :::22                   :::*                    LISTEN     
+```
+---
+
+Install AppArmor
+
+```sh
+apt install -y apparmor-profiles apparmor-utils
 ```

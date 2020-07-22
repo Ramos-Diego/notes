@@ -12,17 +12,18 @@ Become root to setup server faster without sudo
 sudo su
 ```
 
-If you're following this tutorial for another Linux distribution, run this command to see what kind of distro you're running.
-```sh
-cat /etc/*release | grep 'ID_LIKE'
-```
-In Ubuntu you should see: `ID_LIKE="debian"`.
-
 Update and upgrade Ubuntu instance
 ```sh
 apt update && apt upgrade -y
 ```
 - `-y`: Don't ask for confirmation
+
+Check if system needs to be restarted
+
+```sh
+cat /var/run/reboot-required
+```
+If the file doesn't exist, you don't need to restart Ubuntu.
 
 Install **net-tools**
 ```sh
@@ -43,9 +44,6 @@ systemctl status nginx
 
 Install **certbot**
 ```sh
-apt install software-properties-common && \
-add-apt-repository universe && \
-apt update && \
 apt install -y certbot 
 ```
 
@@ -94,9 +92,7 @@ apt update && apt upgrade -y && \
 curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - && \
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list && \
-apt install software-properties-common && \
-add-apt-repository universe && \
-apt update && \
+sudo apt update
 apt install -y nodejs net-tools nginx git gcc g++ make certbot yarn && \
 yarn global add pm2 && \
 systemctl start nginx && \
