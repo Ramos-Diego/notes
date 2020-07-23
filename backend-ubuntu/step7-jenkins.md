@@ -9,6 +9,14 @@ Become root to setup server faster without sudo
 sudo su
 ```
 
+Update Ubuntu and reboot
+
+```sh
+apt update && \
+apt upgrade -y && \
+reboot
+```
+
 Check if Java is installed 
 
 ```sh
@@ -17,15 +25,15 @@ java -version
 
 Expected output
 ```sh
-openjdk version "1.8.0_252"
-OpenJDK Runtime Environment (build 1.8.0_252-8u252-b09-1ubuntu1-b09)
-OpenJDK 64-Bit Server VM (build 25.252-b09, mixed mode)
+openjdk version "11.0.7" 2020-04-14
+OpenJDK Runtime Environment (build 11.0.7+10-post-Ubuntu-3ubuntu1)
+OpenJDK 64-Bit Server VM (build 11.0.7+10-post-Ubuntu-3ubuntu1, mixed mode, sharing)
 ```
 
 Install Java
 ```sh
 sudo apt update && \
-apt install -y openjdk-8-jdk && \
+apt install -y default-jre && \
 ```
 
 Install Jenkins
@@ -35,14 +43,6 @@ sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > \
     /etc/apt/sources.list.d/jenkins.list' && \
 sudo apt-get update && \
 sudo apt-get install -y jenkins
-```
-
-Update Ubuntu and reboot
-
-```sh
-apt update && \
-apt upgrade -y && \
-reboot
 ```
 
 ---
@@ -79,7 +79,7 @@ ufw status && \
 ss -tln
 ```
 
-It is key that you don't forget to allow OpenSSH before enabling the firewall as you may get permanently locked out of your server.
+<mark>It's **IMPORTANT** that you don't forget to allow `OpenSSH` before enabling the firewall as you may get permanently locked out of your server.</mark>
 
 Setting the JAVA_HOME Environment Variable
 
@@ -109,6 +109,18 @@ Expected output
 /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
 ```
 
+Make Jenkins listen only on localhost:8080
+```sh
+nano /etc/default/jenkins
+```
+Edit `JENKINS_ARGS` and add `--httpListenAddress=127.0.0.1` to it
+```sh
+JENKINS_ARGS="--webroot=/var/run/jenkins/war --httpPort=$HTTP_PORT --httpListenAddress=127.0.0.1"
+```
+Restart Jenkins
+```sh
+systemctl restart jenkins
+```
 ---
 
 Setup SSL certificates and NGINX configuartion to connect to open Jenkins in the browser
