@@ -12,11 +12,13 @@ Become root to setup server faster without sudo
 sudo su
 ```
 
-Update and upgrade Ubuntu instance
+Update Ubuntu and reboot
+
 ```sh
-apt update && apt upgrade -y
+apt update && \
+apt upgrade -y && \
+reboot
 ```
-- `-y`: Don't ask for confirmation
 
 Check if system needs to be restarted
 
@@ -92,7 +94,7 @@ apt update && apt upgrade -y && \
 curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - && \
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list && \
-sudo apt update
+apt update && \
 apt install -y nodejs net-tools nginx git gcc g++ make certbot yarn && \
 yarn global add pm2 && \
 systemctl start nginx && \

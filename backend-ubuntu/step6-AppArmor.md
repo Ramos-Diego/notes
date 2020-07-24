@@ -2,7 +2,7 @@ Install and configure NGINX as a reverse proxy serving static files and HTTPS en
 
 Install `apparmor` and `apparmor-utils`
 ```sh
-apt install -y apparmor-profiles apparmor-utils
+apt update && apt install -y apparmor-profiles apparmor-utils
 ```
 
 Create a blank profile
@@ -34,7 +34,12 @@ Allow everything that NGINX needs to work
 aa-logprof
 ```
 
-Verify that the changes were applied 
+Verify that the changes were applied
+```sh
+nano /etc/apparmor.d/usr.sbin.nginx
+```
+
+Make sure to have at least the `#include` and `capability` lines included
 ```
 # Last Modified: Tue Jul 21 23:19:57 2020
 #include <tunables/global>
@@ -51,17 +56,13 @@ Verify that the changes were applied
   capability setuid,
 
   /path/to/example.com/public/** r,
-  /usr/sbin/nginx mr,
   /var/log/nginx/access.log w,
   /var/log/nginx/error.log w,
+  /usr/sbin/nginx mr,
   owner /etc/nginx/** r,
   owner /run/nginx.pid rw,
 }
 ```
-
-- Add the `#include <abstractions/apache2-common>` line - yes, the hash mark is intentional
-- Add the `capability setgid` line
-- Add the `capability setuid` line
 - Update the `/path/to/example.com/public/` line to include the entire directory and all of its subfolder with two asterisk (**)
 - Make sure Nginx can write to the error log by setting w for `/var/log/nginx/error.log`
 

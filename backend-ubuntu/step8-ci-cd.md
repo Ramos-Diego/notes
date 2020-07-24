@@ -22,9 +22,23 @@ ssh root@example.com
 su -l user
 ```
 
-Add the jenkins public key `id_rsa.pub`
+Copy the jenkins public key
+```
+cat ~/.ssh/id_rsa.pub
+```
+
+Paste the jenkins public key `id_rsa.pub`
 ```sh
 nano ~/.ssh/authorized_keys
+```
+
+If this file doesn't exist in the host server, run this
+
+```sh
+mkdir ~/.ssh && \
+chmod 700 ~/.ssh && \
+touch ~/.ssh/authorized_keys && \
+chmod 600 ~/.ssh/authorized_keys
 ```
 
 SSH into your host server as the jenkins user to save your host server in the jenkins' `known_hosts` file
@@ -35,20 +49,42 @@ jenkins@jenkins.example.com:~$ ssh user@example.com
 
 Enter `yes` to add host server to known hosts
 
-Go to your jenkins web interface and add the script to be execute through remote SSH in your host server
+---
+GitHub SSH access for host server
 
+Generate public and private keys for the host server
+```sh
+ssh-keygen -t rsa -b 4096
 ```
+
+Copy the public key and paste it on Github https://github.com/settings/ssh/new
+```
+cat ~/.ssh/id_rsa.pub
+```
+
+Test SSH communication
+```sh
+git clone git@github.com:username/app.git
+```
+
+---
+
+To run app with zero downtime using PM2 
+
+Run the app in cluster mode
+```sh
+pm2 start app.js --name example.com -i max
+```
+
+Whenever you're deploying to your host server, do NOT `restart`, use `reload` instead.
+
+Example script setup in jenkins
+```sh
 ssh user@example.com<<EOF
-  cd ~/myWebApp
+  cd ~/example.com
   git pull origin master
   yarn install
-  pm2 restart all
+  pm2 reload example.com
   exit
 EOF
 ```
-
-# TODO
-
-How do I achieve zero downtime deployment using PM2 and jenkins?
-
-Blue-Green Deployment?

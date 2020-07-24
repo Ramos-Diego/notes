@@ -54,7 +54,7 @@ yarn add express
 
 Start the app using PM2
 ```sh
-pm2 start app.js --name example.com 
+pm2 start app.js --name example.com -i max
 ```
 Go to your domain and test the app.
 
