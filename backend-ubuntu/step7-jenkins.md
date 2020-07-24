@@ -33,7 +33,7 @@ OpenJDK 64-Bit Server VM (build 11.0.7+10-post-Ubuntu-3ubuntu1, mixed mode, shar
 Install Java
 ```sh
 sudo apt update && \
-apt install -y default-jre && \
+apt install -y default-jre
 ```
 
 Install Jenkins
@@ -87,26 +87,29 @@ Find the installation path for Java
 ```sh
 update-alternatives --config java
 ```
+
+```sh
+  Selection    Path                                            Priority   Status
+------------------------------------------------------------
+* 0            /usr/lib/jvm/java-11-openjdk-amd64/bin/java      1111      auto mode
+  1            /usr/lib/jvm/java-11-openjdk-amd64/bin/java      1111      manual mode
+  2            /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java   1081      manual mode
+
+```
+Copy the path for the current choice, marked with *
+
 Create new environmnent variable with the path
 ```sh
 nano /etc/environment
 ```
 ```sh
 # /etc/environment
-JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
-JRE_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java/jre"
+JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64/bin/java"
+JRE_HOME="/usr/lib/jvm/java-11-openjdk-amd64/bin/java/jre"
 ```
 Reload enviroment variables
 ```sh
 source /etc/environment
-```
-Test environment variable
-```sh
-echo $JAVA_HOME
-```
-Expected output
-```sh
-/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
 ```
 
 Make Jenkins listen only on localhost:8080

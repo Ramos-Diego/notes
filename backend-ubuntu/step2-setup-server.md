@@ -1,7 +1,7 @@
 SSH into server
 
 ```sh
-ssh [insert-user]@[insert-ip]
+ssh [insert-user]@[insert-ip-OR-example.com]
 ```
 To login for the first time in DigitaOcean use `root` as user.
 
@@ -98,10 +98,4 @@ yarn global add pm2 && \
 systemctl start nginx && \
 systemctl enable nginx && \
 systemctl status nginx
-```
-
-Log in as non-root user and confirm PM2 is installed
-
-```sh
-pm2 -v
 ```

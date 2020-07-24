@@ -1,5 +1,3 @@
-
-
 Enable firewall
 
 ```sh
@@ -14,16 +12,18 @@ Nginx HTTPS
 OpenSSH
 ```
 
+This will open port :80 (HTTP) and :443 (HTTPS)
 ```sh
 ufw allow 'Nginx Full'
 ```
-This will open port :80 (HTTP) and :443 (HTTPS)
 
+This will open port 22 for all network interfaces: 0.0.0.0
 ```sh
 ufw allow OpenSSH
 ```
-This will open port 22 anywhere 0.0.0.0
+<mark>It's **IMPORTANT** that you don't forget to allow `OpenSSH` before enabling the firewall as you may get permanently locked out of your server.</mark>
 
+Enable firewall
 ```sh
 ufw enable
 ```
@@ -45,7 +45,7 @@ Nginx Full (v6)            ALLOW       Anywhere (v6)
 
 Double check with `ss`
 ```sh
-ss -tln
+netstat -tln
 ```
 
 You should see the following
@@ -58,9 +58,3 @@ tcp6       0      0 :::80                   :::*                    LISTEN
 tcp6       0      0 :::22                   :::*                    LISTEN     
 ```
 ---
-
-Install AppArmor
-
-```sh
-apt install -y apparmor-profiles apparmor-utils
-```

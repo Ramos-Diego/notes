@@ -1,25 +1,26 @@
-## Configure non-root user
-
 Become root
 ```sh
 sudo su
 ```
 
-See if your nginx is working by going to the domain you set up previously. www.example.com
+See if your nginx is working by going to the domain you set up previously. **example.com**
+
+If not check :
+  1. Nginx is running: `systemctl status nginx`
+  2. Port `:80` is open in your droplet: `ss -tln`
 
 Find the nginx default root directory
 ```sh
 cat /etc/nginx/sites-available/default | grep root
 ```
+`/var/www/html` is the default nginx root directory for Ubuntu 18. May vary in other linux distros.
 
-Get certificates
+Get SSL certificates
 ```sh
 certbot certonly --webroot --email your@email.com --no-eff-email --agree-tos -w /var/www/html -d example.com -d www.example.com
 ```
-`/var/www/html` is the default nginx root directory for Ubuntu 18. May vary in other linux distros.
 
-
-Get DH Parameters for SSL
+Get DH Parameters
 ```sh
 openssl dhparam -out /etc/nginx/dhparam.pem 2048
 ```
@@ -29,9 +30,11 @@ Edit `nginx.conf`
 nano /etc/nginx/nginx.conf
 ```
 
-Add, edit `myNginx.conf` and replace the placeholders
+Add, edit `example.com.conf`, `proxy.conf`, `security.conf` and replace the placeholders
 ```sh
 nano /etc/nginx/conf.d/example.com.conf
+nano /etc/nginx/snippets/proxy.conf
+nano /etc/nginx/snippets/security.conf
 ```
 
 All the lines that must be edited have `# EDIT HERE` at the end.
