@@ -126,5 +126,5 @@ systemctl restart jenkins
 ```
 ---
 
-Setup SSL certificates and NGINX configuartion to connect to open Jenkins in the browser
+Setup SSL certificates and NGINX configuartion then open Jenkins in the browser
 
