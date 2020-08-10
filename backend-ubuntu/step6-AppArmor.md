@@ -55,6 +55,7 @@ Make sure to have at least the `#include` and `capability` lines included
   capability setgid,
   capability setuid,
 
+  /var/www/html/** r,
   /path/to/example.com/public/** r,
   /var/log/nginx/access.log w,
   /var/log/nginx/error.log w,
