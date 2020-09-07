@@ -5,18 +5,18 @@ Notes on my path to become a Full-Stack Developer
 
 ## Technologies to learn
 
-- [x] Javascript ($112k)
+- [x] Javascript
 - [x] Node.js
-- [ ] Express
-- [ ] Docker
-- [ ] AWS
-- [ ] Bash/Shell/PowerShell ($120k)
-- [ ] MySQL/SQL
-- [ ] MongoDB
+- [x] Express
+- [x] Docker
+- [x] AWS
+- [x] Bash/Shell/PowerShell
+- [x] MySQL/SQL
+- [x] MongoDB
 - [ ] Redis
-- [ ] Github
+- [x] Github
+- [x] ReactJS
 --- 
 ### Maybe
-- [ ] React.js
-- [ ] Go ($140k)
-- [ ] Python ($120k)
+- [ ] Go
+- [ ] Python
