@@ -1,5 +1,6 @@
-Enable firewall
+## Enable firewall
 
+### Verify the list of apps available for UWF
 ```sh
 ufw app list
 ```
@@ -43,7 +44,7 @@ OpenSSH (v6)               ALLOW       Anywhere (v6)
 Nginx Full (v6)            ALLOW       Anywhere (v6)
 ```
 
-Double check with `ss`
+Double check the open ports
 ```sh
 netstat -tln
 ```

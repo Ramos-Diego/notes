@@ -70,6 +70,7 @@ After installation you need to open port `:8080` for jenkins
 ```sh
 ufw allow 8080/tcp
 ```
+
 Also allow SSH, HTTP and HTTPS
 ```sh
 ufw allow 'Nginx Full' && \

@@ -1,13 +1,13 @@
-SSH into server
+## 2. Install software
 
 ```sh
-ssh [insert-user]@[insert-ip-OR-example.com]
+ssh [insert-user]@[insert-ip-OR-your-domain.com]
 ```
 To login for the first time in DigitaOcean use `root` as user.
 
-## Update and install
+### Install the required software
 
-Become root to setup server faster without sudo
+Become root to easily enter the commands.
 ```sh
 sudo su
 ```
@@ -61,6 +61,8 @@ curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - && \
 apt install -y nodejs
 ```
 
+You can choose any version of Node.js from [here](https://github.com/nodesource/distributions/blob/master/README.md).
+
 Install **Development tools** (for Node.js)
 ```sh
 apt install -y gcc g++ make
@@ -81,12 +83,14 @@ Install **PM2**
 yarn global add pm2
 ```
 
-Verify you have the following programs are installed
+Verify that the following programs are installed
 ```sh
 apt list --installed | egrep 'net-tools|nodejs|yarn|gcc-c++|nginx|certbot|git'
 ```
 
 ---
+
+You can chain these commands to run all the installations at once.
 
 **Installations combined for Ubuntu**
 ```sh

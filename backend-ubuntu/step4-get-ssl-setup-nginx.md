@@ -1,13 +1,10 @@
-Become root
-```sh
-sudo su
-```
+## 4. Get SSL certificates
 
-See if your nginx is working by going to the domain you set up previously. **example.com**
+Confirm that nginx is working by going to the domain you set up previously. **example.com**
 
-If not check :
+If not, check that:
   1. Nginx is running: `systemctl status nginx`
-  2. Port `:80` is open in your droplet: `ss -tln`
+  2. Port `:80` is open in your droplet: `netstat -tln`
 
 Find the nginx default root directory
 ```sh
@@ -24,6 +21,8 @@ Get DH Parameters
 ```sh
 openssl dhparam -out /etc/nginx/dhparam.pem 2048
 ```
+
+The nginx configuration is a bit lengthy. Grab the files from GitHub.
 
 Edit `nginx.conf`
 ```sh
@@ -42,15 +41,15 @@ All the lines that must be edited have `# EDIT HERE` at the end.
 server_name example.com; # EDIT HERE
 ```
 
-Test you made no mistakes on `myNginx.conf`
+Test you made no mistakes configuring NGINX
 ```sh
 nginx -t
 ```
 
 Correct output
 ```sh
-# nginx: the configuration file /etc/nginx/nginx.conf syntax is ok  
-# nginx: configuration file /etc/nginx/nginx.conf test is successful
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok  
+nginx: configuration file /etc/nginx/nginx.conf test is successful
 ```
 
 Restart nginx
