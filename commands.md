@@ -1,5 +1,13 @@
 # The bash commands they don't want you to know!
 
+If you're having issues with `localhost` note resolving on Windows 10 WSL 2 run this on CMD
+
+```sh
+wsl --shutdown
+```
+
+Try again.
+
 ### Remove directory
 
 ``` sh
