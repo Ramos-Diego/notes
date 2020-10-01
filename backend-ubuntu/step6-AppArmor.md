@@ -1,4 +1,6 @@
-Install and configure NGINX as a reverse proxy serving static files and HTTPS enabled 
+# Additional security with AppArmor
+
+AppArmor is a Linux kernel security module that allows the system administrator to restrict programs' capabilities with per-program profiles. This is not mandator, but with this program we will limit what our node apps can access, thus increasing the security in our server.
 
 Install `apparmor` and `apparmor-utils`
 ```sh
@@ -12,7 +14,7 @@ cd /etc/apparmor.d/
 aa-autodep nginx
 ```
 
-Put the new profile in complain mode
+Put the new profile in complain mode. When apparmor is in complain mode it doesn't block any access to the system, but logs all the attempts to access files that it may have blocked.
 
 ```sh
 aa-complain nginx

@@ -1,10 +1,13 @@
-Jenkins should be setup in a seprate server. 
+# Setup a Jenkins server
 
-Setup everything in the server except for the application itself and PM2, then follow these steps
+This tutorial asumes that you have already setup an Ubuntu server with NGINX as a reverse proxy and SSL certificates. 
 
-[Official guide](https://www.jenkins.io/doc/book/installing/#long-term-support-release)
+Spin up a new, separate server with all the same configurations as our node server except for the application itself and PM2, then follow these steps.
 
-Become root to setup server faster without sudo
+Jenkins provide an [Official guide](https://www.jenkins.io/doc/book/installing/#long-term-support-release), but I decided to create my own tutorial.
+
+Become root to setup server faster
+
 ```sh
 sudo su
 ```
@@ -24,6 +27,7 @@ java -version
 ```
 
 Expected output
+
 ```sh
 openjdk version "11.0.7" 2020-04-14
 OpenJDK Runtime Environment (build 11.0.7+10-post-Ubuntu-3ubuntu1)
@@ -65,7 +69,7 @@ systemctl enable nginx && \
 systemctl status nginx
 ```
 
-After installation you need to open port `:8080` for jenkins
+After the installation you need to open port `:8080` for jenkins
 
 ```sh
 ufw allow 8080/tcp

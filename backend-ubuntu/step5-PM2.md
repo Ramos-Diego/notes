@@ -1,4 +1,6 @@
-## 5. Manage your node apps
+# Manage your node apps
+
+We have been using the root user until now to go through all the configuration easily, but you should not run any application as root. We will create a new user with no root access which will run our node apps.
 
 Add an user in Ubuntu
 ```sh
@@ -9,11 +11,11 @@ Switch to the new user
 ```sh
 su -l [insert-username]
 ```
-- `-, -l, --login`: make the shell a login shell
+`-, -l, --login`: make the shell a login shell
 
----
 
 Create the following folder structure in the home directory
+
 ```
 example.com
 ├── public
@@ -30,7 +32,7 @@ Create sample static file (test.html)
 This file will be available at `your-domain.com/test.html`
 
 Create simple test app
-```javascript
+```js
 // ~/node-app/app.js
 const express = require('express')
 const app = express()
@@ -41,9 +43,10 @@ app.get('/', (req, res) => res.json({message: 'Hello world!'}))
 // Start listening on localhost:8080
 app.listen(8080, 'localhost')
 ```
-This message will be available at `your-domain.com`
+This message will be available at `your-domain.com`. The reason for this can be found in the NGINX configuration. In there we setup a reverse proxy which redirects requests on PORT :80 or :443 to :8080 in the loopback interface.
 
 Install dependencies
+
 ```sh
 cd ~/node-app/
 ```
@@ -53,6 +56,7 @@ yarn add express
 ```
 
 Start the app using PM2
+
 ```sh
 pm2 start app.js --name example.com -i max
 ```
