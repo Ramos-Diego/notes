@@ -3,16 +3,18 @@
 We have been using the root user until now to go through all the configuration easily, but you should not run any application as root. We will create a new user with no root access which will run our node apps.
 
 Add an user in Ubuntu
+
 ```sh
 adduser [insert-username]
 ```
 
 Switch to the new user
+
 ```sh
 su -l [insert-username]
 ```
-`-, -l, --login`: make the shell a login shell
 
+`-, -l, --login`: make the shell a login shell
 
 Create the following folder structure in the home directory
 
@@ -24,6 +26,7 @@ example.com
 ```
 
 Create sample static file (test.html)
+
 ```html
 <!-- ~/node-app/public/test.hmtl -->
 <h1>HELLO! NGINX is serving this static file (test.html)</h1>
@@ -32,17 +35,19 @@ Create sample static file (test.html)
 This file will be available at `your-domain.com/test.html`
 
 Create simple test app
+
 ```js
 // ~/node-app/app.js
 const express = require('express')
 const app = express()
 
 // Send a message
-app.get('/', (req, res) => res.json({message: 'Hello world!'}))
+app.get('/', (req, res) => res.json({ message: 'Hello world!' }))
 
 // Start listening on localhost:8080
 app.listen(8080, 'localhost')
 ```
+
 This message will be available at `your-domain.com`. The reason for this can be found in the NGINX configuration. In there we setup a reverse proxy which redirects requests on PORT :80 or :443 to :8080 in the loopback interface.
 
 Install dependencies
@@ -60,6 +65,7 @@ Start the app using PM2
 ```sh
 pm2 start app.js --name example.com -i max
 ```
+
 Note that in order to have 0-downtime deployment your server must have a minimun of 2 CPUs
 
 Go to your domain and test the app.
@@ -71,9 +77,11 @@ pm2 save
 ```
 
 Get the script need to enable PM2 to startup on boot
+
 ```sh
 pm2 startup
 ```
+
 Copy and paste the command provided by PM2.
 
 ```
@@ -83,6 +91,7 @@ sudo env PATH=$PATH:/usr/bin /usr/local/share/.config/yarn/global/node_modules/p
 ```
 
 You can switch back to the root user by loggin out of the current user and run the PM2 command from there
+
 ```sh
 exit
 ```
@@ -90,6 +99,7 @@ exit
 Test by restarting the server
 
 As `root`
+
 ```sh
 reboot
 ```
